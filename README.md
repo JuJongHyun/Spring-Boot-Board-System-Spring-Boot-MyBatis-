@@ -1,4 +1,4 @@
-Spring Boot Board System (SpringBoot, MyBatis
+Spring Boot Board System (SpringBoot, MyBatis)
 
 Spring Boot와 MyBatis를 기반으로 게시판 CRUD와 파일 업로드/다운로드 기능을 구현한 웹 애플리케이션 입니다.
 
