@@ -1,41 +1,59 @@
 @charset "utf-8";
-/* CSS Document */
 
-/* 버튼 기본 스타일 ------------------------------- */
-.btns {display:inline-block; padding:0 10px; height:28px; line-height:26px; text-align:center; vertical-align:middle; border-radius:3px; border:1px solid transparent; /* white-space:nowrap; */ font-weight:500; font-family:'Noto Sans KR', Dotum, Arial, tahoma, Helvetica, sans-serif;}
-a.btns:hover, a.btns:focus, button.btns:hover, button.btns:focus, input.btns:hover, input.btns:focus {opacity:0.9;}
+/* 버튼 기본 스타일 */
+.btns {
+    display:inline-block;
+    padding:0 14px;
+    height:30px;
+    line-height:28px;
+    text-align:center;
+    vertical-align:middle;
+    border-radius:20px;
+    border:1px solid transparent;
+    font-weight:500;
+    font-size:13px;
+    font-family:'Noto Sans KR', Dotum, Arial, tahoma, Helvetica, sans-serif;
+    transition:all 0.2s ease;
+    cursor:pointer;
+}
+a.btns:hover, a.btns:focus,
+button.btns:hover, button.btns:focus,
+input.btns:hover, input.btns:focus {
+    opacity:0.85;
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(215,189,176,0.35);
+}
 a.btns, button {cursor:pointer;}
 button span {position:relative;}
 
 /* 버튼 그룹 */
 .btn_set {text-align:center; margin:20px 0; overflow:hidden;}
-.btn_set > button, .btn_set > a {border-radius:0;}
+.btn_set > button, .btn_set > a {border-radius:20px;}
 
-.btns.primary {background:#fff; border:1px solid #b4b4b4; color:#666;}
+.btns.primary {background:#fff; border:1px solid #D6CCC2; color:#7a6a62;}
 
-.btn_st1 {background:#d74242; color:#fff;} /* 레드 */
-.btn_st2 {background:#666; color:#fff;} /* 그레이 */
-.btn_st3 {background:#139dc8; color:#fff;} /* 블루 */
-.btn_st4 {background:#00bc8c; color:#fff;} /* 그린 */
-.btn_st5 {background:#375a7f; color:#fff;} /* 네이비 */
+/* 채운 버튼 */
+.btn_st1 {background:#c47a7a; border-color:#c47a7a; color:#fff;}   /* 로즈레드 (삭제) */
+.btn_st2 {background:#B4B4B8; border-color:#B4B4B8; color:#fff;}   /* 웜그레이 */
+.btn_st3 {background:#D7BDB0; border-color:#D7BDB0; color:#fff;}   /* 로즈 (주요 액션) */
+.btn_st4 {background:#a8c5a0; border-color:#a8c5a0; color:#fff;}   /* 세이지그린 */
+.btn_st5 {background:#C7C8CC; border-color:#C7C8CC; color:#fff;}   /* 라이트그레이 */
 
-.btn_bdr1 {background:#fff; border:1px solid #d74242; color:#d74242;} /* 레드 */
-.btn_bdr2 {background:#fff; border:1px solid #b4b4b4; color:#666;} /* 그레이 */
-.btn_bdr3 {background:#fff; border:1px solid #199bc4; color:#199bc4;} /* 블루 */
-.btn_bdr4 {background:#fff; border:1px solid #00bc8c; color:#00bc8c;} /* 그린 */
-.btn_bdr5 {background:#fff; border:1px solid #375a7f; color:#375a7f;} /* 네이비 */
+/* 아웃라인 버튼 */
+.btn_bdr1 {background:#fff; border-color:#c47a7a; color:#c47a7a;}
+.btn_bdr2 {background:#fff; border-color:#D6CCC2; color:#7a6a62;}
+.btn_bdr3 {background:#fff; border-color:#D7BDB0; color:#C4907E;}
+.btn_bdr4 {background:#fff; border-color:#a8c5a0; color:#7aaa72;}
+.btn_bdr5 {background:#fff; border-color:#C7C8CC; color:#B4B4B8;}
 
-/* 사이즈 구분 */
-.btn_mid {height:33px; line-height:31px;}
-.btn_xs {padding:0 7px; height:20px; line-height:20px; font-size:11px;}
+/* 사이즈 */
+.btn_mid {height:36px; line-height:34px; padding:0 18px;}
+.btn_xs  {padding:0 9px; height:22px; line-height:20px; font-size:11px;}
 
 .bt_icon {position:relative; padding-left:17px; display:inline-block;}
-.bt_excel:before {background-position:0 -58px; width:12px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;} /* 엑셀 */
-.bt_print:before {background-position:-15px -58px; width:13px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;} /* 프린트 */
-.bt_pdf:before {background-position:-31px -58px; width:13px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;} /* pdf */
+.bt_excel:before  {background-position:0    -58px; width:12px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;}
+.bt_print:before  {background-position:-15px -58px; width:13px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;}
+.bt_pdf:before    {background-position:-31px -58px; width:13px; height:12px; position:absolute; top:50%; left:0; margin-top:-6px;}
 
-.btnW30 {min-width:30px;}
-.btnW40 {min-width:40px;}
-.btnW50 {min-width:50px;}
-.btnW60 {min-width:60px;}
-.btnW70 {min-width:70px;}
+.btnW30{min-width:30px;} .btnW40{min-width:40px;} .btnW50{min-width:50px;}
+.btnW60{min-width:60px;} .btnW70{min-width:70px;}
