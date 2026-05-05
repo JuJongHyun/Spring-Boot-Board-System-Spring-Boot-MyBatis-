@@ -59,14 +59,14 @@
             id = #{id}
     </update>
 
-    <!-- 회원 정보 삭제 (회원 탈퇴) -->
-    <delete id="deleteById" parameterType="long">
+    <!-- 회원 정보 삭제 (soft delete) -->
+    <update id="deleteById" parameterType="long">
         UPDATE tb_member
         SET
             delete_yn = 1
         WHERE
             id = #{id}
-    </delete>
+    </update>
 
     <!-- 회원 수 카운팅 (ID 중복 체크) -->
     <select id="countByLoginId" parameterType="string" resultType="int">

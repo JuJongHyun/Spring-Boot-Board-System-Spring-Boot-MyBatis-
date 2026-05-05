@@ -90,14 +90,14 @@
     </update>
 
 
-    <!-- 게시글 삭제 -->
-    <delete id="deleteById" parameterType="long">
+    <!-- 게시글 삭제 (soft delete) -->
+    <update id="deleteById" parameterType="long">
         UPDATE tb_post
         SET
         delete_yn = 1
         WHERE
         id = #{id}
-    </delete>
+    </update>
 
     <!-- 게시글 리스트 조회 -->
     <select id="findAll" parameterType="com.study.common.dto.SearchDTO" resultType="com.study.domain.post.PostResponse">

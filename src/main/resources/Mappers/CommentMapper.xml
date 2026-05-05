@@ -37,6 +37,8 @@
             tb_comment
         WHERE
             id = #{value}
+        AND
+            delete_yn = 0
     </select>
 
     <!-- 댓글 수정 -->
@@ -50,14 +52,14 @@
             id = #{id}
     </update>
 
-    <!-- 댓글 삭제 -->
-    <delete id="deleteById" parameterType="long">
+    <!-- 댓글 삭제 (soft delete) -->
+    <update id="deleteById" parameterType="long">
         UPDATE tb_comment
         SET
             delete_yn = 1
         WHERE
             id = #{id}
-    </delete>
+    </update>
 
     <!-- 댓글 리스트 조회 -->
     <select id="findAll" parameterType="com.study.domain.comment.CommentSearchDTO" resultType="com.study.domain.comment.CommentResponse">

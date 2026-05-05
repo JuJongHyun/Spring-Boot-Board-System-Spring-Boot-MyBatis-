@@ -2,6 +2,7 @@ package com.study.common.file;
 
 import com.study.domain.file.FileRequest;
 import com.study.domain.file.FileResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -20,7 +21,8 @@ import java.util.UUID;
 @Component
 public class FileUtils {
 
-    private final String uploadPath = Paths.get(System.getProperty("user.home"), "develop", "upload-files").toString();
+    @Value("${file.upload-path}")
+    private String uploadPath;
 
     /**
      * 다중 파일 업로드
@@ -102,7 +104,7 @@ public class FileUtils {
      */
     private String makeDirectories(final String path) {
         File dir = new File(path);
-        if (dir.exists() == false) {
+        if (!dir.exists()) {
             dir.mkdirs();
         }
         return dir.getPath();

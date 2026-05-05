@@ -110,7 +110,7 @@
     window.onload = () => {
         document.querySelectorAll('#loginId, #password').forEach(e => {
             e.addEventListener('keyup', (e) => {
-                if (e.key === 13) {
+                if (e.key === 'Enter') {
                     login();
                 }
             })
@@ -156,7 +156,7 @@
     function validationMemberInfo(form) {
 
         const fields = form.querySelectorAll('input:not([type="radio"])');
-        const fieldNames = ['아이디', '비밀번호', '빕밀번호 재입력', '이름', '생년월일'];
+        const fieldNames = ['아이디', '비밀번호', '비밀번호 재입력', '이름', '생년월일'];
 
         for (let i = 0, len = fields.length; i < len; i++) {
             isValid(fields[i], fieldNames[i]);

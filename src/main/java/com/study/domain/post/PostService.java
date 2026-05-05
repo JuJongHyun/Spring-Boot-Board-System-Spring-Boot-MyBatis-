@@ -1,8 +1,12 @@
 package com.study.domain.post;
 
 import com.study.common.dto.SearchDTO;
+import com.study.common.file.FileUtils;
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
+import com.study.domain.file.FileRequest;
+import com.study.domain.file.FileResponse;
+import com.study.domain.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,15 +19,19 @@ import java.util.List;
 public class PostService {
 
     private final PostMapper postMapper;
+    private final FileService fileService;
+    private final FileUtils fileUtils;
 
     /**
-     * 게시글 저장
-     * @param params - 게시글 정보
+     * 게시글 + 첨부파일 저장 (단일 트랜잭션)
+     * @param params - 게시글 정보 (첨부파일 포함)
      * @return Generated PK
      */
     @Transactional
     public Long savePost(final PostRequest params) {
         postMapper.save(params);
+        List<FileRequest> files = fileUtils.uploadFiles(params.getFiles());
+        fileService.saveFiles(params.getId(), files);
         return params.getId();
     }
 
@@ -37,13 +45,18 @@ public class PostService {
     }
 
     /**
-     * 게시글 수정
-     * @param params - 게시글 정보
+     * 게시글 + 첨부파일 수정 (단일 트랜잭션)
+     * @param params - 게시글 정보 (신규 파일 및 삭제할 파일 ID 포함)
      * @return PK
      */
     @Transactional
     public Long updatePost(final PostRequest params) {
         postMapper.update(params);
+        List<FileRequest> uploadFiles = fileUtils.uploadFiles(params.getFiles());
+        fileService.saveFiles(params.getId(), uploadFiles);
+        List<FileResponse> deleteFiles = fileService.findAllFileByIds(params.getRemoveFileIds());
+        fileUtils.deleteFiles(deleteFiles);
+        fileService.deleteAllFileByIds(params.getRemoveFileIds());
         return params.getId();
     }
 
@@ -52,6 +65,7 @@ public class PostService {
      * @param id - PK
      * @return PK
      */
+    @Transactional
     public Long deletePost(final Long id) {
         postMapper.deleteById(id);
         return id;

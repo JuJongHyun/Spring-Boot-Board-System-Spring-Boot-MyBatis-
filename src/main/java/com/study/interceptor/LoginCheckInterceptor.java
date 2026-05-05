@@ -4,10 +4,11 @@ import com.study.domain.member.MemberResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 
-
+@Component
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
     @Override

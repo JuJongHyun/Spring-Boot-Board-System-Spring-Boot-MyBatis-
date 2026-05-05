@@ -70,6 +70,7 @@ public class CommentService {
         }
 
         Pagination pagination = new Pagination(count, params);
+        params.setPagination(pagination);
         List<CommentResponse> list = commentMapper.findAll(params);
         return new PagingResponse<>(list, pagination);
     }
