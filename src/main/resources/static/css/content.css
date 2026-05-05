@@ -58,9 +58,11 @@ section:first-child, #tabmenu + section {margin-top:0;}
 #tabmenu li a.on {background:#fff; border-bottom-color:#fff; color:#D7BDB0; z-index:1;}
 
 /* ── 테이블 ────────────────────────────── */
-.tb {width:100%; border:1px solid #E3D5CA; margin-top:20px; border-radius:10px; overflow:hidden;}
+.tb {width:100%; border:1px solid #E3D5CA; margin-top:20px; border-radius:10px; overflow:hidden; border-collapse:separate; border-spacing:0;}
 .tb:first-child {margin-top:0;}
-.tb th, .tb td {border:1px solid #E3D5CA; padding:11px 8px; box-sizing:border-box;}
+.tb th, .tb td {border-right:1px solid #E3D5CA; border-bottom:1px solid #E3D5CA; padding:11px 8px; box-sizing:border-box;}
+.tb th:last-child, .tb td:last-child {border-right:0;}
+.tb tr:last-child th, .tb tr:last-child td {border-bottom:0;}
 .tb th {color:#6b5b52;}
 
 .tb_col th {border-bottom:1px solid #D7BDB0;}
