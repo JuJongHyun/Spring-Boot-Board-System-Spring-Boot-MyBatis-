@@ -3,7 +3,8 @@ package com.study.domain.member;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface MemberMapper {
+public interface
+MemberMapper {
 
     /**
      * 회원 정보 저장 (회원가입)
@@ -51,6 +52,24 @@ public interface MemberMapper {
      */
     void changePassword(@org.apache.ibatis.annotations.Param("id") Long id,
                         @org.apache.ibatis.annotations.Param("password") String password);
+
+    /**
+     * 개인정보 변경 (이름, 성별, 생년월일)
+     * @param id - PK
+     * @param params - 변경할 정보
+     */
+    void updateProfile(@org.apache.ibatis.annotations.Param("id") Long id,
+                       @org.apache.ibatis.annotations.Param("name") String name,
+                       @org.apache.ibatis.annotations.Param("gender") Gender gender,
+                       @org.apache.ibatis.annotations.Param("birthday") java.time.LocalDate birthday);
+
+    /**
+     * 프로필 이미지 변경
+     * @param id - PK
+     * @param profileImage - 저장된 파일명
+     */
+    void updateProfileImage(@org.apache.ibatis.annotations.Param("id") Long id,
+                            @org.apache.ibatis.annotations.Param("profileImage") String profileImage);
 
     /**
      * 알림 설정 변경

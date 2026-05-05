@@ -5,141 +5,43 @@
         <title>마이페이지</title>
     </th:block>
 
-    <th:block layout:fragment="content">
-        <div class="page_tits">
-            <h3>마이페이지</h3>
-        </div>
-
-        <div class="content">
-
-            <!-- 프로필 카드 -->
-            <div class="profile_card">
-                <div class="profile_avatar">
-                    <i class="far fa-user-circle"></i>
-                </div>
-                <div class="profile_info">
-                    <strong th:text="${member.name}">홍길동</strong>
-                    <span th:text="${member.loginId}">user01</span>
-                    <em>
-                        <span th:text="${member.gender == T(com.study.domain.member.Gender).M} ? '남성' : '여성'">여성</span>
-                        &nbsp;·&nbsp;
-                        <span th:text="${#temporals.format(member.birthday, 'yyyy년 MM월 dd일')}">1990년 01월 01일</span>
-                        &nbsp;·&nbsp;
-                        <span>가입일 <th:block th:text="${#temporals.format(member.createdDate, 'yyyy.MM.dd')}">2026.01.01</th:block></span>
-                    </em>
-                </div>
-            </div>
-
-            <!-- 탭 메뉴 -->
-            <ul id="tabmenu">
-                <li><a href="javascript:void(0);" class="on" data-tab="tab_noti" onclick="showTab('tab_noti', this)">알림 설정</a></li>
-                <li><a href="javascript:void(0);" data-tab="tab_pw"   onclick="showTab('tab_pw', this)">비밀번호 변경</a></li>
-                <li><a href="javascript:void(0);" data-tab="tab_out"  onclick="showTab('tab_out', this)">회원 탈퇴</a></li>
-            </ul>
-
-            <!-- 탭 1: 알림 설정 -->
-            <section id="tab_noti" class="tab_content">
-                <h4>알림 설정</h4>
-                <p class="tab_desc">알림은 현재 설정만 저장되며, 실제 발송 기능은 추후 제공될 예정입니다.</p>
-                <div class="noti_list">
-                    <div class="noti_row">
-                        <div class="noti_text">
-                            <strong>댓글 알림</strong>
-                            <span>내 게시글에 댓글이 달릴 때 알림을 받습니다.</span>
-                        </div>
-                        <label class="toggle_switch">
-                            <input type="checkbox" id="commentNoti"
-                                   th:checked="${member.commentNotiYn}"
-                                   onchange="updateNotification();" />
-                            <span class="toggle_slider"></span>
-                        </label>
-                    </div>
-                    <div class="noti_row">
-                        <div class="noti_text">
-                            <strong>답글 알림</strong>
-                            <span>내 댓글에 답글이 달릴 때 알림을 받습니다.</span>
-                        </div>
-                        <label class="toggle_switch">
-                            <input type="checkbox" id="replyNoti"
-                                   th:checked="${member.replyNotiYn}"
-                                   onchange="updateNotification();" />
-                            <span class="toggle_slider"></span>
-                        </label>
-                    </div>
-                </div>
-                <p id="noti_saved" class="save_msg" style="display:none;">✓ 저장되었습니다.</p>
-            </section>
-
-            <!-- 탭 2: 비밀번호 변경 -->
-            <section id="tab_pw" class="tab_content" style="display:none;">
-                <h4>비밀번호 변경</h4>
-                <table class="tb tb_row tl" style="max-width:500px;">
-                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
-                    <tbody>
-                        <tr>
-                            <th>현재 비밀번호 <span class="es">필수</span></th>
-                            <td><input type="password" id="currentPassword" placeholder="현재 비밀번호" maxlength="30" /></td>
-                        </tr>
-                        <tr>
-                            <th>새 비밀번호 <span class="es">필수</span></th>
-                            <td><input type="password" id="newPassword" placeholder="새 비밀번호 (8자 이상)" maxlength="30" /></td>
-                        </tr>
-                        <tr>
-                            <th>새 비밀번호 확인 <span class="es">필수</span></th>
-                            <td><input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 재입력" maxlength="30" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p class="btn_set" style="text-align:left; margin-top:16px;">
-                    <button type="button" class="btns btn_st3 btn_mid" onclick="changePassword();">변경하기</button>
-                </p>
-            </section>
-
-            <!-- 탭 3: 회원 탈퇴 -->
-            <section id="tab_out" class="tab_content" style="display:none;">
-                <h4>회원 탈퇴</h4>
-                <div class="withdraw_warn">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>
-                        <strong>탈퇴 전 꼭 확인하세요</strong>
-                        <ul>
-                            <li>탈퇴 후 작성하신 게시글과 댓글은 삭제되지 않습니다.</li>
-                            <li>탈퇴한 아이디는 재사용 및 복구가 불가합니다.</li>
-                            <li>탈퇴 처리는 즉시 반영됩니다.</li>
-                        </ul>
-                    </div>
-                </div>
-                <table class="tb tb_row tl" style="max-width:500px; margin-top:20px;">
-                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
-                    <tbody>
-                        <tr>
-                            <th>비밀번호 확인 <span class="es">필수</span></th>
-                            <td><input type="password" id="withdrawPassword" placeholder="현재 비밀번호 입력" maxlength="30" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p class="btn_set" style="text-align:left; margin-top:16px;">
-                    <button type="button" class="btns btn_st1 btn_mid" onclick="withdrawMember();">탈퇴하기</button>
-                </p>
-            </section>
-
-        </div>
-    </th:block>
-
-    <th:block layout:fragment="script">
+    <th:block layout:fragment="add-css">
         <style>
             /* 프로필 카드 */
             .profile_card {
-                display:flex; align-items:center; gap:20px;
+                display:flex; align-items:center; gap:24px;
                 background:linear-gradient(135deg, #FDF8F5, #F5EBE1);
                 border:1px solid #E3D5CA; border-radius:16px;
                 padding:24px 28px; margin-bottom:28px;
             }
-            .profile_avatar i { font-size:56px; color:#D7BDB0; }
+
+            /* 아바타 */
+            .profile_avatar {
+                position:relative; width:72px; height:72px; flex-shrink:0; cursor:pointer;
+            }
+            .profile_avatar i { font-size:72px; color:#D7BDB0; line-height:1; }
+            .profile_avatar img {
+                width:72px; height:72px; border-radius:50%;
+                object-fit:cover; border:2px solid #E3D5CA;
+            }
+            .avatar_overlay {
+                position:absolute; inset:0; border-radius:50%;
+                background:rgba(0,0,0,0.35); display:flex;
+                align-items:center; justify-content:center;
+                opacity:0; transition:opacity 0.2s;
+            }
+            .avatar_overlay i { font-size:18px; color:#fff; }
+            .profile_avatar:hover .avatar_overlay { opacity:1; }
+            #profileImageInput { display:none; }
+
+            /* 프로필 정보 */
             .profile_info { display:flex; flex-direction:column; gap:6px; }
             .profile_info strong { font-size:20px; color:#3d2f2a; font-weight:600; }
             .profile_info span  { font-size:13px; color:#9a8880; }
             .profile_info em    { font-size:12px; color:#B4B4B8; font-style:normal; }
+
+            /* 탭 컨텐츠 여백 초기화 */
+            .tab_content { margin-top:0 !important; }
 
             /* 탭 설명 */
             .tab_desc { font-size:13px; color:#B4B4B8; margin:-6px 0 20px; }
@@ -176,6 +78,11 @@
             /* 저장 완료 메시지 */
             .save_msg { font-size:13px; color:#a8c5a0; margin-top:14px; font-weight:500; }
 
+            /* 성별 라디오 */
+            .gender_group { display:flex; gap:20px; align-items:center; padding:6px 0; }
+            .gender_group label { display:flex; align-items:center; gap:6px; font-size:14px; color:#3d2f2a; cursor:pointer; }
+            .gender_group input[type="radio"] { accent-color:#D7BDB0; width:16px; height:16px; }
+
             /* 탈퇴 경고 박스 */
             .withdraw_warn {
                 display:flex; gap:14px; align-items:flex-start;
@@ -184,12 +91,185 @@
             }
             .withdraw_warn i { color:#c47a7a; font-size:18px; margin-top:2px; flex-shrink:0; }
             .withdraw_warn strong { display:block; font-size:14px; color:#5a4a44; margin-bottom:8px; }
-            .withdraw_warn ul { margin:0; padding-left:18px; }
+            .withdraw_warn ul { margin:0; padding-left:18px; list-style:disc; }
             .withdraw_warn ul li { font-size:13px; color:#9a8880; line-height:1.8; }
 
             .tl th { text-align:left; }
         </style>
+    </th:block>
 
+    <th:block layout:fragment="content">
+        <div class="page_tits">
+            <h3>마이페이지</h3>
+        </div>
+
+        <div class="content">
+
+            <!-- 프로필 카드 -->
+            <div class="profile_card">
+                <div class="profile_avatar" onclick="document.getElementById('profileImageInput').click();">
+                    <!-- 사진이 있으면 img, 없으면 아이콘 -->
+                    <img th:if="${member.profileImage != null}"
+                         th:src="'/profile-images/' + ${member.profileImage}"
+                         alt="프로필 사진" />
+                    <i th:unless="${member.profileImage != null}" class="far fa-user-circle"></i>
+                    <div class="avatar_overlay"><i class="fas fa-camera"></i></div>
+                </div>
+                <input type="file" id="profileImageInput" accept="image/*" onchange="uploadProfileImage(this);" />
+                <div class="profile_info">
+                    <strong th:text="${member.name}">홍길동</strong>
+                    <span th:text="${member.loginId}">user01</span>
+                    <em>
+                        <span th:text="${member.gender == T(com.study.domain.member.Gender).M} ? '남성' : '여성'">여성</span>
+                        &nbsp;·&nbsp;
+                        <span th:text="${#temporals.format(member.birthday, 'yyyy년 MM월 dd일')}">1990년 01월 01일</span>
+                        &nbsp;·&nbsp;
+                        <span>가입일 <th:block th:text="${#temporals.format(member.createdDate, 'yyyy.MM.dd')}">2026.01.01</th:block></span>
+                    </em>
+                </div>
+            </div>
+
+            <!-- 탭 메뉴 -->
+            <ul id="tabmenu">
+                <li><a href="javascript:void(0);" class="on" data-tab="tab_info" onclick="showTab('tab_info', this)">개인정보 변경</a></li>
+                <li><a href="javascript:void(0);" data-tab="tab_noti"            onclick="showTab('tab_noti', this)">알림 설정</a></li>
+                <li><a href="javascript:void(0);" data-tab="tab_pw"              onclick="showTab('tab_pw', this)">비밀번호 변경</a></li>
+                <li><a href="javascript:void(0);" data-tab="tab_out"             onclick="showTab('tab_out', this)">회원 탈퇴</a></li>
+            </ul>
+
+            <!-- 탭 1: 개인정보 변경 -->
+            <section id="tab_info" class="tab_content">
+                <h4>개인정보 변경</h4>
+                <p class="tab_desc">이름, 성별, 생년월일을 수정할 수 있습니다. 아이디는 변경이 불가합니다.</p>
+                <table class="tb tb_row tl" style="max-width:500px;">
+                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
+                    <tbody>
+                        <tr>
+                            <th>아이디</th>
+                            <td><span th:text="${member.loginId}" style="color:#9a8880; font-size:14px;"></span></td>
+                        </tr>
+                        <tr>
+                            <th>이름 <span class="es">필수</span></th>
+                            <td><input type="text" id="infoName" th:value="${member.name}" maxlength="20" placeholder="이름" /></td>
+                        </tr>
+                        <tr>
+                            <th>성별 <span class="es">필수</span></th>
+                            <td>
+                                <div class="gender_group">
+                                    <label>
+                                        <input type="radio" name="infoGender" value="M"
+                                               th:checked="${member.gender == T(com.study.domain.member.Gender).M}" /> 남성
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="infoGender" value="F"
+                                               th:checked="${member.gender == T(com.study.domain.member.Gender).F}" /> 여성
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>생년월일 <span class="es">필수</span></th>
+                            <td><input type="date" id="infoBirthday"
+                                       th:value="${#temporals.format(member.birthday, 'yyyy-MM-dd')}" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="btn_set" style="text-align:left; margin-top:16px;">
+                    <button type="button" class="btns btn_st3 btn_mid" onclick="updateProfile();">저장하기</button>
+                </p>
+                <p id="info_saved" class="save_msg" style="display:none;">✓ 저장되었습니다.</p>
+            </section>
+
+            <!-- 탭 2: 알림 설정 -->
+            <section id="tab_noti" class="tab_content" style="display:none;">
+                <h4>알림 설정</h4>
+                <p class="tab_desc">알림은 현재 설정만 저장되며, 실제 발송 기능은 추후 제공될 예정입니다.</p>
+                <div class="noti_list">
+                    <div class="noti_row">
+                        <div class="noti_text">
+                            <strong>댓글 알림</strong>
+                            <span>내 게시글에 댓글이 달릴 때 알림을 받습니다.</span>
+                        </div>
+                        <label class="toggle_switch">
+                            <input type="checkbox" id="commentNoti"
+                                   th:checked="${member.commentNotiYn}"
+                                   onchange="updateNotification();" />
+                            <span class="toggle_slider"></span>
+                        </label>
+                    </div>
+                    <div class="noti_row">
+                        <div class="noti_text">
+                            <strong>답글 알림</strong>
+                            <span>내 댓글에 답글이 달릴 때 알림을 받습니다.</span>
+                        </div>
+                        <label class="toggle_switch">
+                            <input type="checkbox" id="replyNoti"
+                                   th:checked="${member.replyNotiYn}"
+                                   onchange="updateNotification();" />
+                            <span class="toggle_slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p id="noti_saved" class="save_msg" style="display:none;">✓ 저장되었습니다.</p>
+            </section>
+
+            <!-- 탭 3: 비밀번호 변경 -->
+            <section id="tab_pw" class="tab_content" style="display:none;">
+                <h4>비밀번호 변경</h4>
+                <table class="tb tb_row tl" style="max-width:500px;">
+                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
+                    <tbody>
+                        <tr>
+                            <th>현재 비밀번호 <span class="es">필수</span></th>
+                            <td><input type="password" id="currentPassword" placeholder="현재 비밀번호" maxlength="30" /></td>
+                        </tr>
+                        <tr>
+                            <th>새 비밀번호 <span class="es">필수</span></th>
+                            <td><input type="password" id="newPassword" placeholder="새 비밀번호 (8자 이상)" maxlength="30" /></td>
+                        </tr>
+                        <tr>
+                            <th>새 비밀번호 확인 <span class="es">필수</span></th>
+                            <td><input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 재입력" maxlength="30" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="btn_set" style="text-align:left; margin-top:16px;">
+                    <button type="button" class="btns btn_st3 btn_mid" onclick="changePassword();">변경하기</button>
+                </p>
+            </section>
+
+            <!-- 탭 4: 회원 탈퇴 -->
+            <section id="tab_out" class="tab_content" style="display:none;">
+                <h4>회원 탈퇴</h4>
+                <div class="withdraw_warn">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>탈퇴 전 꼭 확인하세요</strong>
+                        <ul>
+                            <li>탈퇴 후 작성하신 게시글과 댓글은 삭제되지 않습니다.</li>
+                            <li>탈퇴한 아이디는 재사용 및 복구가 불가합니다.</li>
+                            <li>탈퇴 처리는 즉시 반영됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+                <table class="tb tb_row tl" style="max-width:500px; margin-top:20px;">
+                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
+                    <tbody>
+                        <tr>
+                            <th>비밀번호 확인 <span class="es">필수</span></th>
+                            <td><input type="password" id="withdrawPassword" placeholder="현재 비밀번호 입력" maxlength="30" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="btn_set" style="text-align:left; margin-top:16px;">
+                    <button type="button" class="btns btn_st1 btn_mid" onclick="withdrawMember();">탈퇴하기</button>
+                </p>
+            </section>
+
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
         <script th:inline="javascript">
         /*<![CDATA[*/
 
@@ -200,6 +280,75 @@
                 el.classList.add('on');
             }
 
+            /* 프로필 이미지 업로드 */
+            function uploadProfileImage(input) {
+                if (!input.files || !input.files[0]) return;
+                const file = input.files[0];
+                if (!file.type.startsWith('image/')) {
+                    alert('이미지 파일만 업로드할 수 있습니다.');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('파일 크기는 5MB 이하여야 합니다.');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('file', file);
+                $.ajax({
+                    url: '/api/v1/members/me/profile-image',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        const savedName = res.data;
+                        const avatar = document.querySelector('.profile_avatar');
+                        let img = avatar.querySelector('img');
+                        const icon = avatar.querySelector('i.fa-user-circle');
+                        if (icon) icon.remove();
+                        if (!img) {
+                            img = document.createElement('img');
+                            img.alt = '프로필 사진';
+                            avatar.insertBefore(img, avatar.querySelector('.avatar_overlay'));
+                        }
+                        img.src = '/profile-images/' + savedName + '?t=' + Date.now();
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        alert(res.message || '이미지 업로드에 실패했습니다.');
+                    }
+                });
+            }
+
+            /* 개인정보 변경 */
+            function updateProfile() {
+                const name     = document.getElementById('infoName').value.trim();
+                const gender   = document.querySelector('input[name="infoGender"]:checked')?.value;
+                const birthday = document.getElementById('infoBirthday').value;
+
+                if (!name)     { alert('이름을 입력해 주세요.'); return; }
+                if (!gender)   { alert('성별을 선택해 주세요.'); return; }
+                if (!birthday) { alert('생년월일을 입력해 주세요.'); return; }
+
+                $.ajax({
+                    url: '/api/v1/members/me/profile',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name, gender, birthday }),
+                    success: function(res) {
+                        document.querySelector('.profile_info strong').textContent = name;
+                        const msg = document.getElementById('info_saved');
+                        msg.style.display = 'block';
+                        setTimeout(() => msg.style.display = 'none', 2000);
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        alert(res.message || '저장에 실패했습니다.');
+                    }
+                });
+            }
+
+            /* 알림 설정 변경 */
             function updateNotification() {
                 const params = {
                     commentNotiYn : document.getElementById('commentNoti').checked,
@@ -222,6 +371,7 @@
                 });
             }
 
+            /* 비밀번호 변경 */
             function changePassword() {
                 const currentPassword    = document.getElementById('currentPassword').value.trim();
                 const newPassword        = document.getElementById('newPassword').value.trim();
@@ -248,6 +398,7 @@
                 });
             }
 
+            /* 회원 탈퇴 */
             function withdrawMember() {
                 const password = document.getElementById('withdrawPassword').value.trim();
                 if (!password) { alert('비밀번호를 입력해 주세요.'); return; }

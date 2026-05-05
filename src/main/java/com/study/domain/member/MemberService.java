@@ -57,6 +57,28 @@ public class MemberService {
     }
 
     /**
+     * 개인정보 변경 (이름, 성별, 생년월일)
+     */
+    @Transactional
+    public void updateProfile(Long memberId, ProfileUpdateRequest params) {
+        if (memberMapper.findById(memberId) == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        memberMapper.updateProfile(memberId, params.getName(), params.getGender(), params.getBirthday());
+    }
+
+    /**
+     * 프로필 이미지 변경
+     */
+    @Transactional
+    public void updateProfileImage(Long memberId, String profileImage) {
+        if (memberMapper.findById(memberId) == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        memberMapper.updateProfileImage(memberId, profileImage);
+    }
+
+    /**
      * 비밀번호 변경: 현재 비밀번호 검증 후 새 비밀번호로 교체
      */
     @Transactional

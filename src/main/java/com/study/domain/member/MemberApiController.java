@@ -9,8 +9,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Tag(name = "Member", description = "회원 API")
 @RestController
@@ -19,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 public class MemberApiController {
 
     private final MemberService memberService;
+
+    @Value("${file.upload-path}")
+    private String uploadPath;
 
     @Operation(summary = "회원가입")
     @PostMapping("/members")
@@ -74,6 +84,46 @@ public class MemberApiController {
     }
 
     // ── 마이페이지 API ──────────────────────────────────────────
+
+    @Operation(summary = "개인정보 변경", description = "이름, 성별, 생년월일을 변경합니다.")
+    @PutMapping("/members/me/profile")
+    public ResponseEntity<ApiResponse<MemberResponse>> updateProfile(
+            @RequestBody ProfileUpdateRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        memberService.updateProfile(loginMember.getId(), params);
+        MemberResponse updated = memberService.findMemberById(loginMember.getId());
+        updated.clearPassword();
+        session.setAttribute("loginMember", updated);
+        return ResponseEntity.ok(ApiResponse.ok("개인정보가 변경되었습니다.", updated));
+    }
+
+    @Operation(summary = "프로필 이미지 업로드", description = "프로필 사진을 업로드합니다.")
+    @PostMapping(value = "/members/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<String>> uploadProfileImage(
+            @RequestParam("file") MultipartFile file,
+            HttpSession session) throws IOException {
+        MemberResponse loginMember = getLoginMember(session);
+
+        String ext = "";
+        String originalName = file.getOriginalFilename();
+        if (originalName != null && originalName.contains(".")) {
+            ext = originalName.substring(originalName.lastIndexOf("."));
+        }
+        String savedName = UUID.randomUUID() + ext;
+
+        File dir = new File(uploadPath + "/profile");
+        if (!dir.exists()) dir.mkdirs();
+        file.transferTo(new File(dir, savedName));
+
+        memberService.updateProfileImage(loginMember.getId(), savedName);
+
+        MemberResponse updated = memberService.findMemberById(loginMember.getId());
+        updated.clearPassword();
+        session.setAttribute("loginMember", updated);
+
+        return ResponseEntity.ok(ApiResponse.ok("프로필 이미지가 변경되었습니다.", savedName));
+    }
 
     @Operation(summary = "비밀번호 변경", description = "현재 비밀번호 검증 후 새 비밀번호로 변경합니다.")
     @PutMapping("/members/me/password")

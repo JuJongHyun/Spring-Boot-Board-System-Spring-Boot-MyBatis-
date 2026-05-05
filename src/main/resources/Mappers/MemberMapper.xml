@@ -16,6 +16,7 @@
         , modified_date
         , comment_noti_yn
         , reply_noti_yn
+        , profile_image
     </sql>
 
     <!-- 회원 정보 저장 (회원가입) -->
@@ -80,6 +81,28 @@
         SET
             password = #{password}
         , modified_date = NOW()
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 개인정보 변경 (이름, 성별, 생년월일) -->
+    <update id="updateProfile">
+        UPDATE tb_member
+        SET
+            name          = #{name}
+        , gender        = #{gender}
+        , birthday      = #{birthday}
+        , modified_date = NOW()
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 프로필 이미지 변경 -->
+    <update id="updateProfileImage">
+        UPDATE tb_member
+        SET
+            profile_image = #{profileImage}
+        , modified_date   = NOW()
         WHERE
             id = #{id}
     </update>

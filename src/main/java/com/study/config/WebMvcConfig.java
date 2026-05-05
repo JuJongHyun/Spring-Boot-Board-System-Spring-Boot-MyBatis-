@@ -3,8 +3,10 @@ package com.study.config;
 import com.study.interceptor.LoggerInterceptor;
 import com.study.interceptor.LoginCheckInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -13,6 +15,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final LoggerInterceptor loggerInterceptor;
     private final LoginCheckInterceptor loginCheckInterceptor;
+
+    @Value("${file.upload-path}")
+    private String uploadPath;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/profile-images/**")
+                .addResourceLocations("file:" + uploadPath + "/profile/");
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
