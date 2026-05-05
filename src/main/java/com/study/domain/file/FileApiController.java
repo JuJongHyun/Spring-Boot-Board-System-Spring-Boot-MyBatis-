@@ -1,11 +1,14 @@
 package com.study.domain.file;
 
-
+import com.study.common.exception.BusinessException;
+import com.study.common.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Tag(name = "File", description = "파일 API")
 @RestController
 @RequiredArgsConstructor
 public class FileApiController {
@@ -29,45 +34,39 @@ public class FileApiController {
 
     private final FileService fileService;
 
-    // 파일 리스트 조회
+    @Operation(summary = "게시글 파일 목록 조회")
     @GetMapping("/posts/{postId}/files")
-    public List<FileResponse> findAllFileByPostId(@PathVariable final Long postId) {
+    public List<FileResponse> findAllFileByPostId(
+            @Parameter(description = "게시글 ID") @PathVariable Long postId) {
         return fileService.findAllFileByPostId(postId);
     }
 
-
+    @Operation(summary = "파일 다운로드")
     @GetMapping("/posts/files/{fileId}/download")
-    public ResponseEntity<Resource> downloadFile(@PathVariable final Long fileId) throws IOException {
+    public ResponseEntity<Resource> downloadFile(
+            @Parameter(description = "파일 ID") @PathVariable Long fileId) throws IOException {
 
-        // 1. 파일 조회
         FileResponse file = fileService.findById(fileId);
-
-        // 2. 삭제된 파일 체크
+        if (file == null) {
+            throw new BusinessException(ErrorCode.FILE_NOT_FOUND);
+        }
         if (Boolean.TRUE.equals(file.getDeleteYn())) {
-            throw new RuntimeException("삭제된 파일입니다.");
+            throw new BusinessException(ErrorCode.FILE_DELETED);
         }
 
-        // 3. 업로드 경로
-        String datePath = file.getCreatedDate()
-                .format(DateTimeFormatter.ofPattern("yyMMdd"));
-
-        // 4. 실제 파일 경로
+        String datePath = file.getCreatedDate().format(DateTimeFormatter.ofPattern("yyMMdd"));
         Path path = Paths.get(uploadPath, datePath, file.getSaveName());
         Resource resource = new FileSystemResource(path);
 
-        // 5. 파일 존재 체크
         if (!resource.exists()) {
-            throw new RuntimeException("파일이 존재하지 않습니다.");
+            throw new BusinessException(ErrorCode.FILE_NOT_FOUND);
         }
 
-        // 6. 파일명 인코딩
-        String encodedName = URLEncoder.encode(file.getOriginalName(), "UTF-8")
+        String encodedName = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8)
                 .replace("+", "%20");
 
-        // 7. 응답
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + encodedName + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedName + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }

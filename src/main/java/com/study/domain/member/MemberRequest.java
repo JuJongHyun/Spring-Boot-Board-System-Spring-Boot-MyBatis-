@@ -1,16 +1,17 @@
 package com.study.domain.member;
 
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDate;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 public class MemberRequest {
 
     private long id;                // 회원번호 (PK)
