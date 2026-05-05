@@ -93,9 +93,6 @@ public class PostService {
         return new PagingResponse<>(list, pagination);
     }
 
-
-
-
     /**
      * 게시글 조회 수
      * @return 게시글 조회 수
@@ -103,5 +100,4 @@ public class PostService {
     public void increaseViewCount(final Long id) {
         postMapper.increaseViewCount(id);
     }
-
 }
