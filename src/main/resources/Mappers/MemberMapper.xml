@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.study.domain.member.MemberMapper">
+
     <!-- tb_member 테이블 전체 컬럼 -->
     <sql id="memberColumns">
         id
@@ -13,12 +14,14 @@
         , delete_yn
         , created_date
         , modified_date
+        , comment_noti_yn
+        , reply_noti_yn
     </sql>
 
     <!-- 회원 정보 저장 (회원가입) -->
     <insert id="save" parameterType="com.study.domain.member.MemberRequest" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_member (
-            <include refid="memberColumns" />
+            id, login_id, password, name, gender, birthday, delete_yn, created_date, modified_date
         ) VALUES (
             #{id}
         , #{loginId}
@@ -32,7 +35,7 @@
         )
     </insert>
 
-    <!-- 회원 상세정보 조회 -->
+    <!-- 회원 상세정보 조회 (loginId) -->
     <select id="findByLoginId" parameterType="string" resultType="com.study.domain.member.MemberResponse">
         SELECT
             <include refid="memberColumns" />
@@ -42,6 +45,18 @@
             delete_yn = 0
         AND
             login_id = #{value}
+    </select>
+
+    <!-- 회원 상세정보 조회 (PK) -->
+    <select id="findById" parameterType="long" resultType="com.study.domain.member.MemberResponse">
+        SELECT
+            <include refid="memberColumns" />
+        FROM
+            tb_member
+        WHERE
+            delete_yn = 0
+        AND
+            id = #{value}
     </select>
 
     <!-- 회원 정보 수정 -->
@@ -55,6 +70,27 @@
         <if test="password != null and password != ''">
             , password = #{password}
         </if>
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 비밀번호 변경 -->
+    <update id="changePassword">
+        UPDATE tb_member
+        SET
+            password = #{password}
+        , modified_date = NOW()
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 알림 설정 변경 -->
+    <update id="updateNotification">
+        UPDATE tb_member
+        SET
+            comment_noti_yn = #{commentNotiYn}
+        , reply_noti_yn    = #{replyNotiYn}
+        , modified_date    = NOW()
         WHERE
             id = #{id}
     </update>
@@ -77,4 +113,5 @@
         WHERE
             login_id = #{value}
     </select>
+
 </mapper>

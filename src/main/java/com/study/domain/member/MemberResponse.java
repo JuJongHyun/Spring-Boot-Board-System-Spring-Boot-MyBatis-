@@ -17,6 +17,8 @@ public class MemberResponse {
     private Boolean deleteYn;              // 삭제 여부
     private LocalDateTime createdDate;     // 생성일시
     private LocalDateTime modifiedDate;    // 최종 수정일시
+    private Boolean commentNotiYn;         // 댓글 알림 여부
+    private Boolean replyNotiYn;           // 답글 알림 여부
 
     public void clearPassword() {
         this.password = "";

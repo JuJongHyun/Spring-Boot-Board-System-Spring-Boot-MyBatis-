@@ -20,7 +20,7 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
-    @Operation(summary = "회원가입", description = "새 회원을 등록합니다.")
+    @Operation(summary = "회원가입")
     @PostMapping("/members")
     public ResponseEntity<ApiResponse<Long>> saveMember(@RequestBody MemberRequest params) {
         if (memberService.countMemberByLoginId(params.getLoginId()) > 0) {
@@ -30,7 +30,7 @@ public class MemberApiController {
         return ResponseEntity.status(201).body(ApiResponse.created(id));
     }
 
-    @Operation(summary = "회원 조회", description = "로그인 ID로 회원 상세 정보를 조회합니다.")
+    @Operation(summary = "회원 조회")
     @GetMapping("/members/{loginId}")
     public ResponseEntity<ApiResponse<MemberResponse>> findMemberByLoginId(
             @Parameter(description = "로그인 ID") @PathVariable String loginId) {
@@ -42,24 +42,16 @@ public class MemberApiController {
         return ResponseEntity.ok(ApiResponse.ok(member));
     }
 
-    @Operation(summary = "회원 탈퇴", description = "회원을 소프트 삭제합니다.")
-    @DeleteMapping("/members/{id}")
-    public ResponseEntity<ApiResponse<Long>> deleteMember(
-            @Parameter(description = "회원 ID (PK)") @PathVariable Long id) {
-        memberService.deleteMemberById(id);
-        return ResponseEntity.ok(ApiResponse.ok("회원 탈퇴가 완료되었습니다.", id));
-    }
-
-    @Operation(summary = "아이디 중복 체크", description = "로그인 ID 사용 가능 여부를 확인합니다.")
+    @Operation(summary = "아이디 중복 체크")
     @GetMapping("/members/check-id")
     public ResponseEntity<ApiResponse<Boolean>> checkLoginId(
-            @Parameter(description = "중복 확인할 로그인 ID") @RequestParam String loginId) {
+            @Parameter(description = "로그인 ID") @RequestParam String loginId) {
         boolean available = memberService.countMemberByLoginId(loginId) == 0;
         String message = available ? "사용 가능한 아이디입니다." : "이미 사용 중인 아이디입니다.";
         return ResponseEntity.ok(ApiResponse.ok(message, available));
     }
 
-    @Operation(summary = "로그인", description = "아이디/비밀번호로 로그인하고 세션을 생성합니다.")
+    @Operation(summary = "로그인")
     @PostMapping("/auth/login")
     public ResponseEntity<ApiResponse<MemberResponse>> login(
             @RequestBody LoginRequest params,
@@ -74,10 +66,51 @@ public class MemberApiController {
         return ResponseEntity.ok(ApiResponse.ok("로그인 성공", member));
     }
 
-    @Operation(summary = "로그아웃", description = "현재 세션을 종료합니다.")
+    @Operation(summary = "로그아웃")
     @PostMapping("/auth/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok(ApiResponse.ok("로그아웃 완료", null));
+    }
+
+    // ── 마이페이지 API ──────────────────────────────────────────
+
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호 검증 후 새 비밀번호로 변경합니다.")
+    @PutMapping("/members/me/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @RequestBody PasswordChangeRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        memberService.changePassword(loginMember.getId(), params);
+        return ResponseEntity.ok(ApiResponse.ok("비밀번호가 변경되었습니다.", null));
+    }
+
+    @Operation(summary = "알림 설정 변경", description = "댓글/답글 알림 수신 여부를 변경합니다.")
+    @PutMapping("/members/me/notifications")
+    public ResponseEntity<ApiResponse<Void>> updateNotification(
+            @RequestBody NotificationUpdateRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        memberService.updateNotification(loginMember.getId(), params);
+        return ResponseEntity.ok(ApiResponse.ok("알림 설정이 저장되었습니다.", null));
+    }
+
+    @Operation(summary = "회원탈퇴", description = "비밀번호 확인 후 계정을 삭제합니다.")
+    @DeleteMapping("/members/me")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @RequestBody WithdrawRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        memberService.withdraw(loginMember.getId(), params.getPassword());
+        session.invalidate();
+        return ResponseEntity.ok(ApiResponse.ok("회원탈퇴가 완료되었습니다.", null));
+    }
+
+    private MemberResponse getLoginMember(HttpSession session) {
+        MemberResponse member = (MemberResponse) session.getAttribute("loginMember");
+        if (member == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        return member;
     }
 }

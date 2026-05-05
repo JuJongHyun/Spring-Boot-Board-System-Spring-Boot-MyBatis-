@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Hidden
@@ -18,6 +19,15 @@ public class MemberController {
     @GetMapping("/login.do")
     public String openLoginPage() {
         return "member/login";
+    }
+
+    // 마이페이지
+    @GetMapping("/member/mypage.do")
+    public String openMyPage(HttpSession session, Model model) {
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        MemberResponse member = memberService.findMemberById(loginMember.getId());
+        model.addAttribute("member", member);
+        return "member/mypage";
     }
 
     // 회원 정보 저장 (회원가입)

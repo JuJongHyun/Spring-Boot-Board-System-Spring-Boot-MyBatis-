@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+
+    <th:block layout:fragment="title">
+        <title>마이페이지</title>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <div class="page_tits">
+            <h3>마이페이지</h3>
+        </div>
+
+        <div class="content">
+
+            <!-- 프로필 카드 -->
+            <div class="profile_card">
+                <div class="profile_avatar">
+                    <i class="far fa-user-circle"></i>
+                </div>
+                <div class="profile_info">
+                    <strong th:text="${member.name}">홍길동</strong>
+                    <span th:text="${member.loginId}">user01</span>
+                    <em>
+                        <span th:text="${member.gender == T(com.study.domain.member.Gender).M} ? '남성' : '여성'">여성</span>
+                        &nbsp;·&nbsp;
+                        <span th:text="${#temporals.format(member.birthday, 'yyyy년 MM월 dd일')}">1990년 01월 01일</span>
+                        &nbsp;·&nbsp;
+                        <span>가입일 <th:block th:text="${#temporals.format(member.createdDate, 'yyyy.MM.dd')}">2026.01.01</th:block></span>
+                    </em>
+                </div>
+            </div>
+
+            <!-- 탭 메뉴 -->
+            <ul id="tabmenu">
+                <li><a href="javascript:void(0);" class="on" data-tab="tab_noti" onclick="showTab('tab_noti', this)">알림 설정</a></li>
+                <li><a href="javascript:void(0);" data-tab="tab_pw"   onclick="showTab('tab_pw', this)">비밀번호 변경</a></li>
+                <li><a href="javascript:void(0);" data-tab="tab_out"  onclick="showTab('tab_out', this)">회원 탈퇴</a></li>
+            </ul>
+
+            <!-- 탭 1: 알림 설정 -->
+            <section id="tab_noti" class="tab_content">
+                <h4>알림 설정</h4>
+                <p class="tab_desc">알림은 현재 설정만 저장되며, 실제 발송 기능은 추후 제공될 예정입니다.</p>
+                <div class="noti_list">
+                    <div class="noti_row">
+                        <div class="noti_text">
+                            <strong>댓글 알림</strong>
+                            <span>내 게시글에 댓글이 달릴 때 알림을 받습니다.</span>
+                        </div>
+                        <label class="toggle_switch">
+                            <input type="checkbox" id="commentNoti"
+                                   th:checked="${member.commentNotiYn}"
+                                   onchange="updateNotification();" />
+                            <span class="toggle_slider"></span>
+                        </label>
+                    </div>
+                    <div class="noti_row">
+                        <div class="noti_text">
+                            <strong>답글 알림</strong>
+                            <span>내 댓글에 답글이 달릴 때 알림을 받습니다.</span>
+                        </div>
+                        <label class="toggle_switch">
+                            <input type="checkbox" id="replyNoti"
+                                   th:checked="${member.replyNotiYn}"
+                                   onchange="updateNotification();" />
+                            <span class="toggle_slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p id="noti_saved" class="save_msg" style="display:none;">✓ 저장되었습니다.</p>
+            </section>
+
+            <!-- 탭 2: 비밀번호 변경 -->
+            <section id="tab_pw" class="tab_content" style="display:none;">
+                <h4>비밀번호 변경</h4>
+                <table class="tb tb_row tl" style="max-width:500px;">
+                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
+                    <tbody>
+                        <tr>
+                            <th>현재 비밀번호 <span class="es">필수</span></th>
+                            <td><input type="password" id="currentPassword" placeholder="현재 비밀번호" maxlength="30" /></td>
+                        </tr>
+                        <tr>
+                            <th>새 비밀번호 <span class="es">필수</span></th>
+                            <td><input type="password" id="newPassword" placeholder="새 비밀번호 (8자 이상)" maxlength="30" /></td>
+                        </tr>
+                        <tr>
+                            <th>새 비밀번호 확인 <span class="es">필수</span></th>
+                            <td><input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 재입력" maxlength="30" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="btn_set" style="text-align:left; margin-top:16px;">
+                    <button type="button" class="btns btn_st3 btn_mid" onclick="changePassword();">변경하기</button>
+                </p>
+            </section>
+
+            <!-- 탭 3: 회원 탈퇴 -->
+            <section id="tab_out" class="tab_content" style="display:none;">
+                <h4>회원 탈퇴</h4>
+                <div class="withdraw_warn">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>탈퇴 전 꼭 확인하세요</strong>
+                        <ul>
+                            <li>탈퇴 후 작성하신 게시글과 댓글은 삭제되지 않습니다.</li>
+                            <li>탈퇴한 아이디는 재사용 및 복구가 불가합니다.</li>
+                            <li>탈퇴 처리는 즉시 반영됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+                <table class="tb tb_row tl" style="max-width:500px; margin-top:20px;">
+                    <colgroup><col style="width:35%;"/><col style="width:65%;"/></colgroup>
+                    <tbody>
+                        <tr>
+                            <th>비밀번호 확인 <span class="es">필수</span></th>
+                            <td><input type="password" id="withdrawPassword" placeholder="현재 비밀번호 입력" maxlength="30" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="btn_set" style="text-align:left; margin-top:16px;">
+                    <button type="button" class="btns btn_st1 btn_mid" onclick="withdrawMember();">탈퇴하기</button>
+                </p>
+            </section>
+
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <style>
+            /* 프로필 카드 */
+            .profile_card {
+                display:flex; align-items:center; gap:20px;
+                background:linear-gradient(135deg, #FDF8F5, #F5EBE1);
+                border:1px solid #E3D5CA; border-radius:16px;
+                padding:24px 28px; margin-bottom:28px;
+            }
+            .profile_avatar i { font-size:56px; color:#D7BDB0; }
+            .profile_info { display:flex; flex-direction:column; gap:6px; }
+            .profile_info strong { font-size:20px; color:#3d2f2a; font-weight:600; }
+            .profile_info span  { font-size:13px; color:#9a8880; }
+            .profile_info em    { font-size:12px; color:#B4B4B8; font-style:normal; }
+
+            /* 탭 설명 */
+            .tab_desc { font-size:13px; color:#B4B4B8; margin:-6px 0 20px; }
+
+            /* 알림 토글 */
+            .noti_list { display:flex; flex-direction:column; gap:0; max-width:560px; }
+            .noti_row {
+                display:flex; align-items:center; justify-content:space-between;
+                padding:18px 0; border-bottom:1px solid #F0E8E0;
+            }
+            .noti_row:last-child { border-bottom:none; }
+            .noti_text { display:flex; flex-direction:column; gap:4px; }
+            .noti_text strong { font-size:14px; color:#3d2f2a; font-weight:500; }
+            .noti_text span   { font-size:12px; color:#B4B4B8; }
+
+            /* 토글 스위치 */
+            .toggle_switch { position:relative; width:46px; height:26px; cursor:pointer; flex-shrink:0; }
+            .toggle_switch input { display:none; }
+            .toggle_slider {
+                position:absolute; inset:0;
+                background:#D6CCC2; border-radius:26px;
+                transition:background 0.25s;
+            }
+            .toggle_slider::before {
+                content:''; position:absolute;
+                width:20px; height:20px; left:3px; top:3px;
+                background:#fff; border-radius:50%;
+                transition:transform 0.25s;
+                box-shadow:0 1px 4px rgba(0,0,0,0.15);
+            }
+            .toggle_switch input:checked + .toggle_slider { background:#D7BDB0; }
+            .toggle_switch input:checked + .toggle_slider::before { transform:translateX(20px); }
+
+            /* 저장 완료 메시지 */
+            .save_msg { font-size:13px; color:#a8c5a0; margin-top:14px; font-weight:500; }
+
+            /* 탈퇴 경고 박스 */
+            .withdraw_warn {
+                display:flex; gap:14px; align-items:flex-start;
+                background:#FFF8F6; border:1px solid #f0c8c0;
+                border-radius:12px; padding:18px 20px; max-width:560px;
+            }
+            .withdraw_warn i { color:#c47a7a; font-size:18px; margin-top:2px; flex-shrink:0; }
+            .withdraw_warn strong { display:block; font-size:14px; color:#5a4a44; margin-bottom:8px; }
+            .withdraw_warn ul { margin:0; padding-left:18px; }
+            .withdraw_warn ul li { font-size:13px; color:#9a8880; line-height:1.8; }
+
+            .tl th { text-align:left; }
+        </style>
+
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+
+            function showTab(tabId, el) {
+                document.querySelectorAll('.tab_content').forEach(t => t.style.display = 'none');
+                document.querySelectorAll('#tabmenu a').forEach(a => a.classList.remove('on'));
+                document.getElementById(tabId).style.display = 'block';
+                el.classList.add('on');
+            }
+
+            function updateNotification() {
+                const params = {
+                    commentNotiYn : document.getElementById('commentNoti').checked,
+                    replyNotiYn   : document.getElementById('replyNoti').checked
+                };
+                $.ajax({
+                    url: '/api/v1/members/me/notifications',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(params),
+                    success: function(res) {
+                        const msg = document.getElementById('noti_saved');
+                        msg.style.display = 'block';
+                        setTimeout(() => msg.style.display = 'none', 2000);
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        alert(res.message || '저장에 실패했습니다.');
+                    }
+                });
+            }
+
+            function changePassword() {
+                const currentPassword    = document.getElementById('currentPassword').value.trim();
+                const newPassword        = document.getElementById('newPassword').value.trim();
+                const newPasswordConfirm = document.getElementById('newPasswordConfirm').value.trim();
+
+                if (!currentPassword)    { alert('현재 비밀번호를 입력해 주세요.'); return; }
+                if (!newPassword)        { alert('새 비밀번호를 입력해 주세요.'); return; }
+                if (newPassword.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+                if (newPassword !== newPasswordConfirm) { alert('새 비밀번호가 일치하지 않습니다.'); return; }
+
+                $.ajax({
+                    url: '/api/v1/members/me/password',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ currentPassword, newPassword, newPasswordConfirm }),
+                    success: function(res) {
+                        alert('비밀번호가 변경되었습니다.\n다시 로그인해 주세요.');
+                        location.href = '/logout';
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        alert(res.message || '비밀번호 변경에 실패했습니다.');
+                    }
+                });
+            }
+
+            function withdrawMember() {
+                const password = document.getElementById('withdrawPassword').value.trim();
+                if (!password) { alert('비밀번호를 입력해 주세요.'); return; }
+                if (!confirm('정말 탈퇴하시겠습니까?\n탈퇴 후에는 되돌릴 수 없습니다.')) return;
+
+                $.ajax({
+                    url: '/api/v1/members/me',
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ password }),
+                    success: function(res) {
+                        alert('회원탈퇴가 완료되었습니다.\n이용해 주셔서 감사합니다.');
+                        location.href = '/login.do';
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        alert(res.message || '탈퇴 처리에 실패했습니다.');
+                    }
+                });
+            }
+
+        /*]]>*/
+        </script>
+    </th:block>
+
+</html>

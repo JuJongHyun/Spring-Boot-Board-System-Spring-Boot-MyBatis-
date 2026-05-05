@@ -37,4 +37,29 @@ public interface MemberMapper {
      */
     int countByLoginId(String loginId);
 
+    /**
+     * 회원 PK 조회
+     * @param id - PK
+     * @return 회원 상세정보
+     */
+    MemberResponse findById(Long id);
+
+    /**
+     * 비밀번호 변경
+     * @param id - PK
+     * @param password - 인코딩된 새 비밀번호
+     */
+    void changePassword(@org.apache.ibatis.annotations.Param("id") Long id,
+                        @org.apache.ibatis.annotations.Param("password") String password);
+
+    /**
+     * 알림 설정 변경
+     * @param id - PK
+     * @param commentNotiYn - 댓글 알림
+     * @param replyNotiYn - 답글 알림
+     */
+    void updateNotification(@org.apache.ibatis.annotations.Param("id") Long id,
+                            @org.apache.ibatis.annotations.Param("commentNotiYn") boolean commentNotiYn,
+                            @org.apache.ibatis.annotations.Param("replyNotiYn") boolean replyNotiYn);
+
 }

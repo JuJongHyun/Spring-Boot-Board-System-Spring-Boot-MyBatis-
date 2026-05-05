@@ -11,6 +11,10 @@ public enum ErrorCode {
     // 400 Bad Request
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
 
+    // 400 Bad Request
+    WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "현재 비밀번호가 올바르지 않습니다."),
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "새 비밀번호가 일치하지 않습니다."),
+
     // 401 Unauthorized
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
