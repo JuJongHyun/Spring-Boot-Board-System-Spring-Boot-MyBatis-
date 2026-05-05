@@ -1,11 +1,13 @@
 package com.study.domain.member;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@Hidden
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
