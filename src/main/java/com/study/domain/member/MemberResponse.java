@@ -20,6 +20,7 @@ public class MemberResponse {
     private Boolean commentNotiYn;         // 댓글 알림 여부
     private Boolean replyNotiYn;           // 답글 알림 여부
     private String profileImage;           // 프로필 이미지 파일명
+    private MemberRole role;               // 권한 (USER / ADMIN)
 
     public void clearPassword() {
         this.password = "";

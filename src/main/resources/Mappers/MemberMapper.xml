@@ -17,6 +17,7 @@
         , comment_noti_yn
         , reply_noti_yn
         , profile_image
+        , role
     </sql>
 
     <!-- 회원 정보 저장 (회원가입) -->

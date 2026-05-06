@@ -6,7 +6,6 @@ import com.study.common.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,28 +58,6 @@ public class MemberApiController {
         boolean available = memberService.countMemberByLoginId(loginId) == 0;
         String message = available ? "사용 가능한 아이디입니다." : "이미 사용 중인 아이디입니다.";
         return ResponseEntity.ok(ApiResponse.ok(message, available));
-    }
-
-    @Operation(summary = "로그인")
-    @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse<MemberResponse>> login(
-            @RequestBody LoginRequest params,
-            HttpServletRequest request) {
-        MemberResponse member = memberService.login(params.getLoginId(), params.getPassword());
-        if (member == null) {
-            throw new BusinessException(ErrorCode.LOGIN_FAILED);
-        }
-        HttpSession session = request.getSession();
-        session.setAttribute("loginMember", member);
-        session.setMaxInactiveInterval(60 * 30);
-        return ResponseEntity.ok(ApiResponse.ok("로그인 성공", member));
-    }
-
-    @Operation(summary = "로그아웃")
-    @PostMapping("/auth/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
-        session.invalidate();
-        return ResponseEntity.ok(ApiResponse.ok("로그아웃 완료", null));
     }
 
     // ── 마이페이지 API ──────────────────────────────────────────
