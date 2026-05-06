@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+
+    <th:block layout:fragment="title"><title>관리자 페이지</title></th:block>
+
+    <th:block layout:fragment="add-css">
+        <style>
+            /* 탭 컨텐츠 여백 초기화 */
+            .tab_content { margin-top: 0 !important; }
+
+            /* 통계 카드 */
+            .stat_grid {
+                display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px;
+            }
+            .stat_card {
+                background: #fff; border: 1px solid #E3D5CA; border-radius: 14px; padding: 20px 22px;
+                display: flex; flex-direction: column; gap: 8px;
+            }
+            .stat_icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+            .stat_label { font-size: 12px; color: #9a8880; }
+            .stat_value { font-size: 26px; font-weight: 700; color: #3d2f2a; line-height: 1; }
+            .stat_sub   { font-size: 11px; color: #B4B4B8; }
+            .icon_member  { background: #FDF0E8; color: #D7936A; }
+            .icon_today   { background: #E8F4FD; color: #5AABCE; }
+            .icon_post    { background: #F0F8EC; color: #72B35A; }
+            .icon_comment { background: #F5EEF8; color: #A87EC9; }
+
+            /* 역할 뱃지 */
+            .role_badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+            .role_admin { background: #FDE8E8; color: #C45A5A; }
+            .role_user  { background: #E8F4E8; color: #5A9C5A; }
+
+            /* 검색바 */
+            .search_bar { display: flex; gap: 8px; margin-bottom: 14px; }
+            .search_bar input,
+            .search_bar select {
+                padding: 8px 12px; border: 1px solid #E3D5CA; border-radius: 8px;
+                font-size: 13px; background: #fff;
+            }
+            .search_bar input { flex: 1; }
+
+            @media (max-width: 900px) { .stat_grid { grid-template-columns: repeat(2, 1fr); } }
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <div class="page_tits">
+            <h3>관리자 페이지</h3>
+        </div>
+
+        <div class="content">
+
+            <!-- 탭 메뉴 -->
+            <ul id="tabmenu">
+                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'dashboard'} ? 'on'" onclick="showTab('tab_dashboard', this)">대시보드</a></li>
+                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'members'}  ? 'on'" onclick="showTab('tab_members',  this)">회원 관리</a></li>
+                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'posts'}    ? 'on'" onclick="showTab('tab_posts',    this)">게시글 관리</a></li>
+            </ul>
+
+            <!-- 탭 1: 대시보드 -->
+            <section id="tab_dashboard" class="tab_content"
+                     th:style="${activeTab != 'dashboard'} ? 'display:none'">
+                <div class="stat_grid">
+                    <div class="stat_card">
+                        <div class="stat_icon icon_member"><i class="fas fa-users"></i></div>
+                        <span class="stat_label">전체 회원</span>
+                        <span class="stat_value" th:text="${stats.totalMembers}">0</span>
+                        <span class="stat_sub">활성 회원 수</span>
+                    </div>
+                    <div class="stat_card">
+                        <div class="stat_icon icon_today"><i class="fas fa-user-plus"></i></div>
+                        <span class="stat_label">오늘 가입</span>
+                        <span class="stat_value" th:text="${stats.todaySignups}">0</span>
+                        <span class="stat_sub">금일 신규 가입</span>
+                    </div>
+                    <div class="stat_card">
+                        <div class="stat_icon icon_post"><i class="fas fa-file-alt"></i></div>
+                        <span class="stat_label">전체 게시글</span>
+                        <span class="stat_value" th:text="${stats.totalPosts}">0</span>
+                        <span class="stat_sub">삭제 제외 기준</span>
+                    </div>
+                    <div class="stat_card">
+                        <div class="stat_icon icon_comment"><i class="fas fa-comment-dots"></i></div>
+                        <span class="stat_label">전체 댓글</span>
+                        <span class="stat_value" th:text="${stats.totalComments}">0</span>
+                        <span class="stat_sub">삭제 제외 기준</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 탭 2: 회원 관리 -->
+            <section id="tab_members" class="tab_content"
+                     th:style="${activeTab != 'members'} ? 'display:none'">
+
+                <form method="get" th:action="@{/admin/index.do}">
+                    <input type="hidden" name="tab" value="members" />
+                    <div class="search_bar">
+                        <input type="text" name="mKeyword" th:value="${mKeyword}" placeholder="아이디 또는 이름 검색" />
+                        <button type="submit" class="btns btn_st3 btn_mid">검색</button>
+                        <a th:href="@{/admin/index.do(tab='members')}" class="btns btn_bdr3 btn_mid">초기화</a>
+                    </div>
+                </form>
+
+                <table class="tb tb_col">
+                    <colgroup>
+                        <col style="width:6%"/><col style="width:14%"/><col style="width:12%"/>
+                        <col style="width:7%"/><col style="width:10%"/><col style="width:17%"/>
+                        <col style="width:17%"/><col style="width:17%"/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>번호</th><th>아이디</th><th>이름</th>
+                            <th>성별</th><th>권한</th><th>가입일</th>
+                            <th>권한 변경</th><th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(members.list)}">
+                            <td colspan="8" style="text-align:center; color:#B4B4B8; padding:40px 0;">회원이 없습니다.</td>
+                        </tr>
+                        <tr th:each="m : ${members.list}">
+                            <td th:text="${m.id}"></td>
+                            <td th:text="${m.loginId}"></td>
+                            <td th:text="${m.name}"></td>
+                            <td th:text="${m.gender == T(com.study.domain.member.Gender).M} ? '남' : '여'"></td>
+                            <td>
+                                <span class="role_badge"
+                                      th:classappend="${m.role == T(com.study.domain.member.MemberRole).ADMIN} ? 'role_admin' : 'role_user'"
+                                      th:text="${m.role}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(m.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
+                            <td>
+                                <button type="button" class="btns btn_sml btn-role"
+                                        th:classappend="${m.role == T(com.study.domain.member.MemberRole).ADMIN} ? 'btn_bdr3' : 'btn_st3'"
+                                        th:data-id="${m.id}"
+                                        th:data-target="${m.role == T(com.study.domain.member.MemberRole).USER ? 'ADMIN' : 'USER'}"
+                                        th:text="${m.role == T(com.study.domain.member.MemberRole).USER ? '관리자로' : '일반으로'}">
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btns btn_st1 btn_sml btn-withdraw"
+                                        th:data-id="${m.id}"
+                                        th:data-loginid="${m.loginId}">강제탈퇴</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <div th:if="${members.pagination != null}" class="paging_area">
+                    <th:block th:with="pg=${members.pagination}">
+                        <a th:if="${pg.existPrevPage}"
+                           th:href="@{/admin/index.do(tab='members', mPage=${pg.startPage - 1}, mKeyword=${mKeyword})}"
+                           class="page_btn">&lt;</a>
+                        <th:block th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}">
+                            <a th:href="@{/admin/index.do(tab='members', mPage=${num}, mKeyword=${mKeyword})}"
+                               th:text="${num}"
+                               th:classappend="${num == pg.currentPage} ? ' on'"
+                               class="page_btn"></a>
+                        </th:block>
+                        <a th:if="${pg.existNextPage}"
+                           th:href="@{/admin/index.do(tab='members', mPage=${pg.endPage + 1}, mKeyword=${mKeyword})}"
+                           class="page_btn">&gt;</a>
+                    </th:block>
+                </div>
+            </section>
+
+            <!-- 탭 3: 게시글 관리 -->
+            <section id="tab_posts" class="tab_content"
+                     th:style="${activeTab != 'posts'} ? 'display:none'">
+
+                <form method="get" th:action="@{/admin/index.do}">
+                    <input type="hidden" name="tab" value="posts" />
+                    <div class="search_bar">
+                        <select name="pSearchType">
+                            <option value="" th:selected="${pSearchType == ''}">전체</option>
+                            <option value="title"   th:selected="${pSearchType == 'title'}">제목</option>
+                            <option value="writer"  th:selected="${pSearchType == 'writer'}">작성자</option>
+                            <option value="content" th:selected="${pSearchType == 'content'}">내용</option>
+                        </select>
+                        <input type="text" name="pKeyword" th:value="${pKeyword}" placeholder="검색어 입력" />
+                        <button type="submit" class="btns btn_st3 btn_mid">검색</button>
+                        <a th:href="@{/admin/index.do(tab='posts')}" class="btns btn_bdr3 btn_mid">초기화</a>
+                    </div>
+                </form>
+
+                <table class="tb tb_col">
+                    <colgroup>
+                        <col style="width:6%"/><col style="width:42%"/><col style="width:13%"/>
+                        <col style="width:7%"/><col style="width:17%"/><col style="width:15%"/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>번호</th><th>제목</th><th>작성자</th>
+                            <th>조회</th><th>등록일</th><th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(posts.list)}">
+                            <td colspan="6" style="text-align:center; color:#B4B4B8; padding:40px 0;">게시글이 없습니다.</td>
+                        </tr>
+                        <tr th:each="p : ${posts.list}">
+                            <td th:text="${p.id}"></td>
+                            <td style="text-align:left; padding-left:14px;">
+                                <a th:href="@{/post/view.do(id=${p.id})}" th:text="${p.title}"
+                                   style="color:#3d2f2a;"></a>
+                            </td>
+                            <td th:text="${p.writer}"></td>
+                            <td th:text="${p.viewCnt}"></td>
+                            <td th:text="${#temporals.format(p.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
+                            <td>
+                                <button type="button" class="btns btn_st1 btn_sml btn-delete-post"
+                                        th:data-id="${p.id}"
+                                        th:data-title="${p.title}">삭제</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <div th:if="${posts.pagination != null}" class="paging_area">
+                    <th:block th:with="pg=${posts.pagination}">
+                        <a th:if="${pg.existPrevPage}"
+                           th:href="@{/admin/index.do(tab='posts', pPage=${pg.startPage - 1}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
+                           class="page_btn">&lt;</a>
+                        <th:block th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}">
+                            <a th:href="@{/admin/index.do(tab='posts', pPage=${num}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
+                               th:text="${num}"
+                               th:classappend="${num == pg.currentPage} ? ' on'"
+                               class="page_btn"></a>
+                        </th:block>
+                        <a th:if="${pg.existNextPage}"
+                           th:href="@{/admin/index.do(tab='posts', pPage=${pg.endPage + 1}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
+                           class="page_btn">&gt;</a>
+                    </th:block>
+                </div>
+            </section>
+
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script>
+            function showTab(tabId, el) {
+                document.querySelectorAll('.tab_content').forEach(t => t.style.display = 'none');
+                document.querySelectorAll('#tabmenu a').forEach(a => a.classList.remove('on'));
+                document.getElementById(tabId).style.display = 'block';
+                el.classList.add('on');
+            }
+
+            // 권한 변경
+            document.querySelectorAll('.btn-role').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id     = this.dataset.id;
+                    const target = this.dataset.target;
+                    const label  = target === 'ADMIN' ? '관리자' : '일반 회원';
+                    if (!confirm(`권한을 ${label}으로 변경하시겠습니까?`)) return;
+                    $.ajax({
+                        url: `/api/v1/admin/members/${id}/role`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ role: target }),
+                        success: () => location.href = '/admin/index.do?tab=members',
+                        error: xhr => alert(JSON.parse(xhr.responseText).message || '변경 실패')
+                    });
+                });
+            });
+
+            // 강제 탈퇴
+            document.querySelectorAll('.btn-withdraw').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id      = this.dataset.id;
+                    const loginId = this.dataset.loginid;
+                    if (!confirm(`[${loginId}] 회원을 강제 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+                    $.ajax({
+                        url: `/api/v1/admin/members/${id}`,
+                        type: 'DELETE',
+                        success: () => location.href = '/admin/index.do?tab=members',
+                        error: xhr => alert(JSON.parse(xhr.responseText).message || '처리 실패')
+                    });
+                });
+            });
+
+            // 게시글 삭제
+            document.querySelectorAll('.btn-delete-post').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id    = this.dataset.id;
+                    const title = this.dataset.title;
+                    if (!confirm(`[${title}]\n게시글을 삭제하시겠습니까?`)) return;
+                    $.ajax({
+                        url: `/api/v1/admin/posts/${id}`,
+                        type: 'DELETE',
+                        success: () => location.href = '/admin/index.do?tab=posts',
+                        error: xhr => alert(JSON.parse(xhr.responseText).message || '삭제 실패')
+                    });
+                });
+            });
+        </script>
+    </th:block>
+
+</html>
