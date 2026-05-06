@@ -81,4 +81,17 @@ MemberMapper {
                             @org.apache.ibatis.annotations.Param("commentNotiYn") boolean commentNotiYn,
                             @org.apache.ibatis.annotations.Param("replyNotiYn") boolean replyNotiYn);
 
+    // ── 관리자용 ──────────────────────────────────────────
+
+    int countActive();
+
+    int countToday();
+
+    int countForAdmin(com.study.common.dto.SearchDTO params);
+
+    java.util.List<MemberResponse> findAllForAdmin(com.study.common.dto.SearchDTO params);
+
+    void updateRole(@org.apache.ibatis.annotations.Param("id") Long id,
+                    @org.apache.ibatis.annotations.Param("role") MemberRole role);
+
 }

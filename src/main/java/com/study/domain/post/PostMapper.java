@@ -45,6 +45,8 @@ public interface PostMapper {
      */
      int count(SearchDTO params);
 
+    int countAll();
+
     /**
      * 게시글 조회 카운팅
      * @return 조회 수

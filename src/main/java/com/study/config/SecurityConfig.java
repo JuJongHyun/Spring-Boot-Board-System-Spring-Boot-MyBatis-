@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/members", "/api/v1/members/check-id").permitAll()
                 .requestMatchers("/member-count", "/members").permitAll()
                 // 관리자 전용
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
                 // 나머지는 로그인 필요
                 .anyRequest().authenticated()
             )

@@ -46,4 +46,6 @@ public interface CommentMapper {
      */
     int count(CommentSearchDTO params);
 
+    int countAll();
+
 }

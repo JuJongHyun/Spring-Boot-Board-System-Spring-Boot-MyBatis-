@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+
+    <th:block layout:fragment="title"><title>게시글 관리</title></th:block>
+
+    <th:block layout:fragment="add-css">
+        <style>
+            .search_bar { display:flex; gap:8px; margin-bottom:16px; }
+            .search_bar input { flex:1; padding:8px 12px; border:1px solid #E3D5CA; border-radius:8px; font-size:14px; }
+            .search_bar select { padding:8px 12px; border:1px solid #E3D5CA; border-radius:8px; font-size:14px; background:#fff; }
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <div class="page_tits">
+            <h3>게시글 관리</h3>
+        </div>
+
+        <div class="content">
+
+            <!-- 검색 -->
+            <form method="get" action="/admin/posts.do">
+                <div class="search_bar">
+                    <select name="searchType">
+                        <option value="" th:selected="${param.searchType == null or param.searchType == ''}">전체</option>
+                        <option value="title"   th:selected="${param.searchType == 'title'}">제목</option>
+                        <option value="writer"  th:selected="${param.searchType == 'writer'}">작성자</option>
+                        <option value="content" th:selected="${param.searchType == 'content'}">내용</option>
+                    </select>
+                    <input type="text" name="keyword" th:value="${param.keyword}" placeholder="검색어 입력" />
+                    <button type="submit" class="btns btn_st3 btn_mid">검색</button>
+                    <a href="/admin/posts.do" class="btns btn_bdr3 btn_mid">초기화</a>
+                </div>
+            </form>
+
+            <!-- 게시글 테이블 -->
+            <table class="tb tb_col">
+                <colgroup>
+                    <col style="width:6%"/><col style="width:40%"/><col style="width:12%"/>
+                    <col style="width:8%"/><col style="width:16%"/><col style="width:18%"/>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>번호</th><th>제목</th><th>작성자</th>
+                        <th>조회</th><th>등록일</th><th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(response.list)}">
+                        <td colspan="6" style="text-align:center; color:#B4B4B8; padding:40px 0;">게시글이 없습니다.</td>
+                    </tr>
+                    <tr th:each="post : ${response.list}">
+                        <td th:text="${post.id}"></td>
+                        <td style="text-align:left; padding-left:14px;">
+                            <a th:href="@{/post/view.do(id=${post.id})}" th:text="${post.title}"
+                               style="color:#3d2f2a; text-decoration:none;"
+                               onmouseover="this.style.textDecoration='underline'"
+                               onmouseout="this.style.textDecoration='none'"></a>
+                        </td>
+                        <td th:text="${post.writer}"></td>
+                        <td th:text="${post.viewCnt}"></td>
+                        <td th:text="${#temporals.format(post.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
+                        <td>
+                            <button type="button" class="btns btn_st1 btn_sml"
+                                    th:onclick="'deletePost(' + ${post.id} + ', \'' + ${post.title} + '\')'">삭제</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지네이션 -->
+            <div th:if="${response.pagination != null}" class="paging_area">
+                <th:block th:with="paging=${response.pagination}">
+                    <a th:if="${paging.existPrevPage}" th:href="@{/admin/posts.do(page=${paging.startPage - 1}, keyword=${param.keyword}, searchType=${param.searchType})}" class="page_btn">&lt;</a>
+                    <th:block th:each="num : ${#numbers.sequence(paging.startPage, paging.endPage)}">
+                        <a th:href="@{/admin/posts.do(page=${num}, keyword=${param.keyword}, searchType=${param.searchType})}"
+                           th:text="${num}"
+                           th:classappend="${num == paging.currentPage} ? ' on' : ''"
+                           class="page_btn"></a>
+                    </th:block>
+                    <a th:if="${paging.existNextPage}" th:href="@{/admin/posts.do(page=${paging.endPage + 1}, keyword=${param.keyword}, searchType=${param.searchType})}" class="page_btn">&gt;</a>
+                </th:block>
+            </div>
+
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script>
+            function deletePost(id, title) {
+                if (!confirm(`[${title}]\n게시글을 삭제하시겠습니까?`)) return;
+                $.ajax({
+                    url: `/api/v1/admin/posts/${id}`,
+                    type: 'DELETE',
+                    success: function() { location.reload(); },
+                    error: function(xhr) {
+                        alert(JSON.parse(xhr.responseText).message || '삭제에 실패했습니다.');
+                    }
+                });
+            }
+        </script>
+    </th:block>
+
+</html>

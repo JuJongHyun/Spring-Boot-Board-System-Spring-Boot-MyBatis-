@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body th:fragment="main-body">
 <div id="adm_wrap">
     <header>
@@ -31,6 +31,14 @@
                     <li class="has_sub"><a href="javascript: void(0);"><span>회원 관리</span></a>
                         <ul>
                             <li><a href="/member/mypage.do">마이페이지</a></li>
+                        </ul>
+                    </li>
+                    <li class="has_sub" sec:authorize="hasRole('ADMIN')">
+                        <a href="javascript: void(0);"><span>관리자</span></a>
+                        <ul>
+                            <li><a href="/admin/dashboard.do">대시보드</a></li>
+                            <li><a href="/admin/members.do">회원 관리</a></li>
+                            <li><a href="/admin/posts.do">게시글 관리</a></li>
                         </ul>
                     </li>
                 </ul>

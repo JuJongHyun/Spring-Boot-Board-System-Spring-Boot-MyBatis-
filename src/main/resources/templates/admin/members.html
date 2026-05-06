@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+
+    <th:block layout:fragment="title"><title>회원 관리</title></th:block>
+
+    <th:block layout:fragment="add-css">
+        <style>
+            .role_badge {
+                display: inline-block; padding: 3px 10px;
+                border-radius: 20px; font-size: 11px; font-weight: 600;
+            }
+            .role_admin { background: #FDE8E8; color: #C45A5A; }
+            .role_user  { background: #E8F4E8; color: #5A9C5A; }
+            .search_bar { display:flex; gap:8px; margin-bottom:16px; }
+            .search_bar input { flex:1; padding:8px 12px; border:1px solid #E3D5CA; border-radius:8px; font-size:14px; }
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <div class="page_tits">
+            <h3>회원 관리</h3>
+        </div>
+
+        <div class="content">
+
+            <!-- 검색 -->
+            <form id="searchForm" method="get" action="/admin/members.do">
+                <div class="search_bar">
+                    <input type="text" name="keyword" th:value="${param.keyword}" placeholder="아이디 또는 이름 검색" />
+                    <button type="submit" class="btns btn_st3 btn_mid">검색</button>
+                    <a href="/admin/members.do" class="btns btn_bdr3 btn_mid">초기화</a>
+                </div>
+            </form>
+
+            <!-- 회원 테이블 -->
+            <table class="tb tb_col">
+                <colgroup>
+                    <col style="width:6%"/><col style="width:14%"/><col style="width:12%"/>
+                    <col style="width:8%"/><col style="width:10%"/><col style="width:16%"/>
+                    <col style="width:17%"/><col style="width:17%"/>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>번호</th><th>아이디</th><th>이름</th>
+                        <th>성별</th><th>권한</th><th>가입일</th>
+                        <th>권한 변경</th><th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(response.list)}">
+                        <td colspan="8" style="text-align:center; color:#B4B4B8; padding:40px 0;">회원이 없습니다.</td>
+                    </tr>
+                    <tr th:each="member : ${response.list}">
+                        <td th:text="${member.id}"></td>
+                        <td th:text="${member.loginId}"></td>
+                        <td th:text="${member.name}"></td>
+                        <td th:text="${member.gender == T(com.study.domain.member.Gender).M} ? '남' : '여'"></td>
+                        <td>
+                            <span class="role_badge"
+                                  th:classappend="${member.role == T(com.study.domain.member.MemberRole).ADMIN} ? 'role_admin' : 'role_user'"
+                                  th:text="${member.role}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(member.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
+                        <td>
+                            <button type="button" class="btns btn_st3 btn_sml"
+                                    th:if="${member.role == T(com.study.domain.member.MemberRole).USER}"
+                                    th:onclick="'changeRole(' + ${member.id} + ', \'ADMIN\')'">관리자로</button>
+                            <button type="button" class="btns btn_bdr3 btn_sml"
+                                    th:if="${member.role == T(com.study.domain.member.MemberRole).ADMIN}"
+                                    th:onclick="'changeRole(' + ${member.id} + ', \'USER\')'">일반으로</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btns btn_st1 btn_sml"
+                                    th:onclick="'forceWithdraw(' + ${member.id} + ', \'' + ${member.loginId} + '\')'">강제탈퇴</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지네이션 -->
+            <div th:if="${response.pagination != null}" class="paging_area">
+                <th:block th:with="paging=${response.pagination}">
+                    <a th:if="${paging.existPrevPage}" th:href="@{/admin/members.do(page=${paging.startPage - 1}, keyword=${param.keyword})}" class="page_btn">&lt;</a>
+                    <th:block th:each="num : ${#numbers.sequence(paging.startPage, paging.endPage)}">
+                        <a th:href="@{/admin/members.do(page=${num}, keyword=${param.keyword})}"
+                           th:text="${num}"
+                           th:classappend="${num == paging.currentPage} ? ' on' : ''"
+                           class="page_btn"></a>
+                    </th:block>
+                    <a th:if="${paging.existNextPage}" th:href="@{/admin/members.do(page=${paging.endPage + 1}, keyword=${param.keyword})}" class="page_btn">&gt;</a>
+                </th:block>
+            </div>
+
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script>
+            function changeRole(id, role) {
+                const label = (role === 'ADMIN') ? '관리자' : '일반 회원';
+                if (!confirm(`권한을 ${label}으로 변경하시겠습니까?`)) return;
+                $.ajax({
+                    url: `/api/v1/admin/members/${id}/role`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ role }),
+                    success: function() { location.reload(); },
+                    error: function(xhr) {
+                        alert(JSON.parse(xhr.responseText).message || '변경에 실패했습니다.');
+                    }
+                });
+            }
+
+            function forceWithdraw(id, loginId) {
+                if (!confirm(`[${loginId}] 회원을 강제 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+                $.ajax({
+                    url: `/api/v1/admin/members/${id}`,
+                    type: 'DELETE',
+                    success: function() { location.reload(); },
+                    error: function(xhr) {
+                        alert(JSON.parse(xhr.responseText).message || '처리에 실패했습니다.');
+                    }
+                });
+            }
+        </script>
+    </th:block>
+
+</html>
