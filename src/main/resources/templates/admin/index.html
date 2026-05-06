@@ -31,8 +31,10 @@
             .search_bar input,
             .search_bar select {
                 padding:8px 12px; border:1px solid #E3D5CA; border-radius:8px; font-size:13px; background:#fff;
+                flex-shrink:0;
             }
             .search_bar input { flex:1; }
+            .search_bar select { width:90px; }
 
             @media (max-width:900px) { .stat_grid { grid-template-columns:repeat(2,1fr); } }
         </style>
