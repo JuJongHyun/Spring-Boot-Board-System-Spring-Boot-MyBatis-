@@ -147,7 +147,7 @@
                         <a th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}"
                            th:href="@{/admin/index.do(tab='members',mPage=${num},mKeyword=${mKeyword})}"
                            th:text="${num}"
-                           th:class="${num == pg.currentPage} ? 'page_btn on' : 'page_btn'"></a>
+                           th:class="${num == mPage} ? 'page_btn on' : 'page_btn'"></a>
                         <a th:if="${pg.existNextPage}"
                            th:href="@{/admin/index.do(tab='members',mPage=${pg.endPage+1},mKeyword=${mKeyword})}"
                            class="page_btn">&gt;</a>
@@ -212,7 +212,7 @@
                         <a th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}"
                            th:href="@{/admin/index.do(tab='posts',pPage=${num},pKeyword=${pKeyword},pSearchType=${pSearchType})}"
                            th:text="${num}"
-                           th:class="${num == pg.currentPage} ? 'page_btn on' : 'page_btn'"></a>
+                           th:class="${num == pPage} ? 'page_btn on' : 'page_btn'"></a>
                         <a th:if="${pg.existNextPage}"
                            th:href="@{/admin/index.do(tab='posts',pPage=${pg.endPage+1},pKeyword=${pKeyword},pSearchType=${pSearchType})}"
                            class="page_btn">&gt;</a>

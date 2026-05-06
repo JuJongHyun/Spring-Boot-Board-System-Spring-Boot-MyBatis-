@@ -37,6 +37,7 @@ public class AdminController {
         memberParams.setPage(mPage);
         model.addAttribute("members", adminService.findAllMembers(memberParams));
         model.addAttribute("mKeyword", mKeyword);
+        model.addAttribute("mPage", mPage);
 
         SearchDTO postParams = new SearchDTO();
         postParams.setKeyword(pKeyword);
@@ -45,6 +46,7 @@ public class AdminController {
         model.addAttribute("posts", adminService.findAllPosts(postParams));
         model.addAttribute("pKeyword", pKeyword);
         model.addAttribute("pSearchType", pSearchType);
+        model.addAttribute("pPage", pPage);
 
         return "admin/index";
     }
