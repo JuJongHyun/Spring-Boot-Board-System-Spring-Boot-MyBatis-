@@ -5,45 +5,43 @@
 
     <th:block layout:fragment="add-css">
         <style>
-            /* 탭 컨텐츠 여백 초기화 */
             .tab_content { margin-top: 0 !important; }
 
-            /* 통계 카드 */
             .stat_grid {
                 display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px;
             }
             .stat_card {
-                background: #fff; border: 1px solid #E3D5CA; border-radius: 14px; padding: 20px 22px;
-                display: flex; flex-direction: column; gap: 8px;
+                background: #fff; border: 1px solid #E3D5CA; border-radius: 14px;
+                padding: 20px 22px; display: flex; flex-direction: column; gap: 8px;
             }
-            .stat_icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
-            .stat_label { font-size: 12px; color: #9a8880; }
-            .stat_value { font-size: 26px; font-weight: 700; color: #3d2f2a; line-height: 1; }
-            .stat_sub   { font-size: 11px; color: #B4B4B8; }
-            .icon_member  { background: #FDF0E8; color: #D7936A; }
-            .icon_today   { background: #E8F4FD; color: #5AABCE; }
-            .icon_post    { background: #F0F8EC; color: #72B35A; }
-            .icon_comment { background: #F5EEF8; color: #A87EC9; }
+            .stat_icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:17px; }
+            .stat_label { font-size:12px; color:#9a8880; }
+            .stat_value { font-size:26px; font-weight:700; color:#3d2f2a; line-height:1; }
+            .stat_sub   { font-size:11px; color:#B4B4B8; }
+            .icon_member  { background:#FDF0E8; color:#D7936A; }
+            .icon_today   { background:#E8F4FD; color:#5AABCE; }
+            .icon_post    { background:#F0F8EC; color:#72B35A; }
+            .icon_comment { background:#F5EEF8; color:#A87EC9; }
 
-            /* 역할 뱃지 */
-            .role_badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-            .role_admin { background: #FDE8E8; color: #C45A5A; }
-            .role_user  { background: #E8F4E8; color: #5A9C5A; }
+            .role_badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+            .role_admin { background:#FDE8E8; color:#C45A5A; }
+            .role_user  { background:#E8F4E8; color:#5A9C5A; }
 
-            /* 검색바 */
-            .search_bar { display: flex; gap: 8px; margin-bottom: 14px; }
+            .search_bar { display:flex; gap:8px; margin-bottom:14px; }
             .search_bar input,
             .search_bar select {
-                padding: 8px 12px; border: 1px solid #E3D5CA; border-radius: 8px;
-                font-size: 13px; background: #fff;
+                padding:8px 12px; border:1px solid #E3D5CA; border-radius:8px; font-size:13px; background:#fff;
             }
-            .search_bar input { flex: 1; }
+            .search_bar input { flex:1; }
 
-            @media (max-width: 900px) { .stat_grid { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width:900px) { .stat_grid { grid-template-columns:repeat(2,1fr); } }
         </style>
     </th:block>
 
+    <!-- activeTab 서버 값을 JS로 전달하기 위한 hidden 요소 -->
     <th:block layout:fragment="content">
+        <div id="activeTabValue" th:data-tab="${activeTab}" style="display:none"></div>
+
         <div class="page_tits">
             <h3>관리자 페이지</h3>
         </div>
@@ -52,14 +50,13 @@
 
             <!-- 탭 메뉴 -->
             <ul id="tabmenu">
-                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'dashboard'} ? 'on'" onclick="showTab('tab_dashboard', this)">대시보드</a></li>
-                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'members'}  ? 'on'" onclick="showTab('tab_members',  this)">회원 관리</a></li>
-                <li><a href="javascript:void(0);" th:classappend="${activeTab == 'posts'}    ? 'on'" onclick="showTab('tab_posts',    this)">게시글 관리</a></li>
+                <li><a href="javascript:void(0);" data-tab="dashboard" onclick="showTab('tab_dashboard', this)">대시보드</a></li>
+                <li><a href="javascript:void(0);" data-tab="members"   onclick="showTab('tab_members',   this)">회원 관리</a></li>
+                <li><a href="javascript:void(0);" data-tab="posts"     onclick="showTab('tab_posts',     this)">게시글 관리</a></li>
             </ul>
 
-            <!-- 탭 1: 대시보드 -->
-            <section id="tab_dashboard" class="tab_content"
-                     th:style="${activeTab != 'dashboard'} ? 'display:none'">
+            <!-- ── 탭 1: 대시보드 ─────────────────────────── -->
+            <section id="tab_dashboard" class="tab_content">
                 <div class="stat_grid">
                     <div class="stat_card">
                         <div class="stat_icon icon_member"><i class="fas fa-users"></i></div>
@@ -88,9 +85,8 @@
                 </div>
             </section>
 
-            <!-- 탭 2: 회원 관리 -->
-            <section id="tab_members" class="tab_content"
-                     th:style="${activeTab != 'members'} ? 'display:none'">
+            <!-- ── 탭 2: 회원 관리 ─────────────────────────── -->
+            <section id="tab_members" class="tab_content" style="display:none">
 
                 <form method="get" th:action="@{/admin/index.do}">
                     <input type="hidden" name="tab" value="members" />
@@ -116,66 +112,59 @@
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(members.list)}">
-                            <td colspan="8" style="text-align:center; color:#B4B4B8; padding:40px 0;">회원이 없습니다.</td>
+                            <td colspan="8" style="text-align:center;color:#B4B4B8;padding:40px 0;">회원이 없습니다.</td>
                         </tr>
                         <tr th:each="m : ${members.list}">
                             <td th:text="${m.id}"></td>
                             <td th:text="${m.loginId}"></td>
                             <td th:text="${m.name}"></td>
-                            <td th:text="${m.gender == T(com.study.domain.member.Gender).M} ? '남' : '여'"></td>
+                            <td th:text="${m.gender.name() == 'M'} ? '남' : '여'"></td>
                             <td>
-                                <span class="role_badge"
-                                      th:classappend="${m.role == T(com.study.domain.member.MemberRole).ADMIN} ? 'role_admin' : 'role_user'"
-                                      th:text="${m.role}"></span>
+                                <span th:class="${m.role.name() == 'ADMIN'} ? 'role_badge role_admin' : 'role_badge role_user'"
+                                      th:text="${m.role.name()}"></span>
                             </td>
                             <td th:text="${#temporals.format(m.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
                             <td>
-                                <button type="button" class="btns btn_sml btn-role"
-                                        th:classappend="${m.role == T(com.study.domain.member.MemberRole).ADMIN} ? 'btn_bdr3' : 'btn_st3'"
-                                        th:data-id="${m.id}"
-                                        th:data-target="${m.role == T(com.study.domain.member.MemberRole).USER ? 'ADMIN' : 'USER'}"
-                                        th:text="${m.role == T(com.study.domain.member.MemberRole).USER ? '관리자로' : '일반으로'}">
+                                <button type="button"
+                                        th:class="${m.role.name() == 'ADMIN'} ? 'btns btn_bdr3 btn_sml btn-role' : 'btns btn_st3 btn_sml btn-role'"
+                                        th:attr="data-id=${m.id}, data-target=${m.role.name() == 'USER' ? 'ADMIN' : 'USER'}"
+                                        th:text="${m.role.name() == 'USER'} ? '관리자로' : '일반으로'">
                                 </button>
                             </td>
                             <td>
                                 <button type="button" class="btns btn_st1 btn_sml btn-withdraw"
-                                        th:data-id="${m.id}"
-                                        th:data-loginid="${m.loginId}">강제탈퇴</button>
+                                        th:attr="data-id=${m.id}, data-loginid=${m.loginId}">강제탈퇴</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <!-- 페이지네이션 -->
                 <div th:if="${members.pagination != null}" class="paging_area">
                     <th:block th:with="pg=${members.pagination}">
                         <a th:if="${pg.existPrevPage}"
-                           th:href="@{/admin/index.do(tab='members', mPage=${pg.startPage - 1}, mKeyword=${mKeyword})}"
+                           th:href="@{/admin/index.do(tab='members',mPage=${pg.startPage-1},mKeyword=${mKeyword})}"
                            class="page_btn">&lt;</a>
-                        <th:block th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}">
-                            <a th:href="@{/admin/index.do(tab='members', mPage=${num}, mKeyword=${mKeyword})}"
-                               th:text="${num}"
-                               th:classappend="${num == pg.currentPage} ? ' on'"
-                               class="page_btn"></a>
-                        </th:block>
+                        <a th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}"
+                           th:href="@{/admin/index.do(tab='members',mPage=${num},mKeyword=${mKeyword})}"
+                           th:text="${num}"
+                           th:class="${num == pg.currentPage} ? 'page_btn on' : 'page_btn'"></a>
                         <a th:if="${pg.existNextPage}"
-                           th:href="@{/admin/index.do(tab='members', mPage=${pg.endPage + 1}, mKeyword=${mKeyword})}"
+                           th:href="@{/admin/index.do(tab='members',mPage=${pg.endPage+1},mKeyword=${mKeyword})}"
                            class="page_btn">&gt;</a>
                     </th:block>
                 </div>
             </section>
 
-            <!-- 탭 3: 게시글 관리 -->
-            <section id="tab_posts" class="tab_content"
-                     th:style="${activeTab != 'posts'} ? 'display:none'">
+            <!-- ── 탭 3: 게시글 관리 ─────────────────────────── -->
+            <section id="tab_posts" class="tab_content" style="display:none">
 
                 <form method="get" th:action="@{/admin/index.do}">
                     <input type="hidden" name="tab" value="posts" />
                     <div class="search_bar">
                         <select name="pSearchType">
-                            <option value="" th:selected="${pSearchType == ''}">전체</option>
-                            <option value="title"   th:selected="${pSearchType == 'title'}">제목</option>
-                            <option value="writer"  th:selected="${pSearchType == 'writer'}">작성자</option>
+                            <option value=""       th:selected="${pSearchType == ''}">전체</option>
+                            <option value="title"  th:selected="${pSearchType == 'title'}">제목</option>
+                            <option value="writer" th:selected="${pSearchType == 'writer'}">작성자</option>
                             <option value="content" th:selected="${pSearchType == 'content'}">내용</option>
                         </select>
                         <input type="text" name="pKeyword" th:value="${pKeyword}" placeholder="검색어 입력" />
@@ -197,40 +186,35 @@
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(posts.list)}">
-                            <td colspan="6" style="text-align:center; color:#B4B4B8; padding:40px 0;">게시글이 없습니다.</td>
+                            <td colspan="6" style="text-align:center;color:#B4B4B8;padding:40px 0;">게시글이 없습니다.</td>
                         </tr>
                         <tr th:each="p : ${posts.list}">
                             <td th:text="${p.id}"></td>
-                            <td style="text-align:left; padding-left:14px;">
-                                <a th:href="@{/post/view.do(id=${p.id})}" th:text="${p.title}"
-                                   style="color:#3d2f2a;"></a>
+                            <td style="text-align:left;padding-left:14px;">
+                                <a th:href="@{/post/view.do(id=${p.id})}" th:text="${p.title}" style="color:#3d2f2a;"></a>
                             </td>
                             <td th:text="${p.writer}"></td>
                             <td th:text="${p.viewCnt}"></td>
                             <td th:text="${#temporals.format(p.createdDate, 'yyyy.MM.dd HH:mm')}"></td>
                             <td>
                                 <button type="button" class="btns btn_st1 btn_sml btn-delete-post"
-                                        th:data-id="${p.id}"
-                                        th:data-title="${p.title}">삭제</button>
+                                        th:attr="data-id=${p.id}, data-title=${p.title}">삭제</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <!-- 페이지네이션 -->
                 <div th:if="${posts.pagination != null}" class="paging_area">
                     <th:block th:with="pg=${posts.pagination}">
                         <a th:if="${pg.existPrevPage}"
-                           th:href="@{/admin/index.do(tab='posts', pPage=${pg.startPage - 1}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
+                           th:href="@{/admin/index.do(tab='posts',pPage=${pg.startPage-1},pKeyword=${pKeyword},pSearchType=${pSearchType})}"
                            class="page_btn">&lt;</a>
-                        <th:block th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}">
-                            <a th:href="@{/admin/index.do(tab='posts', pPage=${num}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
-                               th:text="${num}"
-                               th:classappend="${num == pg.currentPage} ? ' on'"
-                               class="page_btn"></a>
-                        </th:block>
+                        <a th:each="num : ${#numbers.sequence(pg.startPage, pg.endPage)}"
+                           th:href="@{/admin/index.do(tab='posts',pPage=${num},pKeyword=${pKeyword},pSearchType=${pSearchType})}"
+                           th:text="${num}"
+                           th:class="${num == pg.currentPage} ? 'page_btn on' : 'page_btn'"></a>
                         <a th:if="${pg.existNextPage}"
-                           th:href="@{/admin/index.do(tab='posts', pPage=${pg.endPage + 1}, pKeyword=${pKeyword}, pSearchType=${pSearchType})}"
+                           th:href="@{/admin/index.do(tab='posts',pPage=${pg.endPage+1},pKeyword=${pKeyword},pSearchType=${pSearchType})}"
                            class="page_btn">&gt;</a>
                     </th:block>
                 </div>
@@ -247,6 +231,13 @@
                 document.getElementById(tabId).style.display = 'block';
                 el.classList.add('on');
             }
+
+            // 서버에서 전달된 activeTab으로 초기 탭 설정
+            (function () {
+                const activeTab = document.getElementById('activeTabValue').dataset.tab || 'dashboard';
+                const link = document.querySelector(`#tabmenu a[data-tab="${activeTab}"]`);
+                if (link) showTab('tab_' + activeTab, link);
+            })();
 
             // 권한 변경
             document.querySelectorAll('.btn-role').forEach(btn => {
