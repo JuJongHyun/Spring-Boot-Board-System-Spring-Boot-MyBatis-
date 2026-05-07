@@ -7,16 +7,18 @@
             <h1>게시판 프로젝트</h1>
             <div th:if="${session.loginMember != null}" class="top_menu">
                 <div class="login_user"><strong><i class="far fa-user-circle"></i> [[ ${session.loginMember.name} ]]</strong> 님, 환영합니다 🌸</div>
-                <div class="noti_wrap" style="position:relative;display:inline-block;margin-right:12px;cursor:pointer;" onclick="toggleNotiPanel()">
-                    <i class="fas fa-bell" style="font-size:18px;"></i>
-                    <span id="noti_badge" style="display:none;position:absolute;top:-6px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;font-size:11px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 3px;"></span>
-                    <div id="noti_panel" style="display:none;position:absolute;right:0;top:28px;width:320px;max-height:360px;overflow-y:auto;background:#fff;border:1px solid #ddd;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:999;">
-                        <div style="padding:10px 14px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
-                            <strong style="font-size:13px;">알림</strong>
-                            <a href="javascript:void(0);" onclick="markAllAsRead(event)" style="font-size:12px;color:#888;">모두 읽음</a>
+                <div class="noti_wrap">
+                    <button class="noti_btn" onclick="toggleNotiPanel()" type="button" title="알림">
+                        <i class="fas fa-bell"></i>
+                        <i id="noti_badge" class="noti_badge"></i>
+                    </button>
+                    <div id="noti_panel" class="noti_panel">
+                        <div class="noti_panel_head">
+                            <strong>알림</strong>
+                            <a href="javascript:void(0);" onclick="markAllAsRead(event)">모두 읽음</a>
                         </div>
-                        <ul id="noti_list" style="list-style:none;margin:0;padding:0;"></ul>
-                        <div id="noti_empty" style="padding:20px;text-align:center;color:#aaa;font-size:13px;display:none;">새 알림이 없습니다.</div>
+                        <ul id="noti_list" class="noti_list"></ul>
+                        <div id="noti_empty" class="noti_empty">새 알림이 없습니다.</div>
                     </div>
                 </div>
                 <div class="logout">
@@ -141,9 +143,9 @@
     function prependNotification(n) {
         const ul = document.getElementById('noti_list');
         const li = document.createElement('li');
-        li.style.cssText = 'padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;cursor:pointer;';
+        li.className = 'noti_item';
         li.dataset.id = n.id;
-        li.innerHTML = '<a href="/post/view.do?id=' + n.postId + '" style="color:#333;text-decoration:none;" onclick="readNoti(event,' + n.id + ')">' + n.message + '</a>';
+        li.innerHTML = '<a href="/post/view.do?id=' + n.postId + '" onclick="readNoti(event,' + n.id + ')">' + n.message + '</a>';
         ul.insertBefore(li, ul.firstChild);
     }
 

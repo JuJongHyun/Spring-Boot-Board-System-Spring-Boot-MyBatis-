@@ -52,6 +52,48 @@ header .head .top_menu > div.login_user {margin-right:16px;}
 header .head .top_menu > div.login_user strong {color:#5a4a44;}
 header .head .top_menu > div.login_user strong i {font-size:16px; vertical-align:bottom; color:#D7BDB0;}
 
+/* ── 알림 벨 ─────────────────────────────── */
+.noti_wrap {position:relative; display:inline-block; margin-right:10px; vertical-align:middle;}
+.noti_btn {
+    background:#E3D5CA; border:0; border-radius:20px;
+    width:34px; height:34px; padding:0; cursor:pointer;
+    transition:background 0.2s; position:relative;
+}
+.noti_btn:hover {background:#D7BDB0;}
+.noti_btn i {font-size:14px; color:#fff; line-height:34px;}
+.noti_badge {
+    display:none; position:absolute; top:-5px; right:-5px;
+    background:#c55a5a; color:#fff; border-radius:50%;
+    font-size:10px; min-width:17px; height:17px;
+    line-height:17px; text-align:center; padding:0 3px;
+    font-style:normal; pointer-events:none;
+}
+.noti_panel {
+    display:none; position:absolute; right:0; top:42px;
+    width:300px; background:#fff;
+    border:1px solid #E3D5CA; border-radius:12px;
+    box-shadow:0 8px 24px rgba(215,189,176,0.3);
+    z-index:999; overflow:hidden;
+}
+.noti_panel_head {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px; border-bottom:1px solid #E3D5CA;
+    background:#faf7f5;
+}
+.noti_panel_head strong {font-size:13px; color:#3d2f2a; font-weight:600;}
+.noti_panel_head a {font-size:12px; color:#B4B4B8; transition:color 0.2s;}
+.noti_panel_head a:hover {color:#D7BDB0;}
+.noti_list {max-height:320px; overflow-y:auto; margin:0; padding:0;}
+.noti_item {border-bottom:1px solid #F2EFE5;}
+.noti_item:last-child {border-bottom:0;}
+.noti_item a {
+    display:block; padding:12px 16px;
+    font-size:12px; color:#5a4a44; line-height:1.6;
+    transition:background 0.15s;
+}
+.noti_item a:hover {background:#faf7f5; color:#3d2f2a;}
+.noti_empty {padding:24px 16px; text-align:center; color:#B4B4B8; font-size:13px; display:none;}
+
 /* ── 사이드 네비게이션 ─────────────────── */
 nav * {box-sizing:border-box;}
 nav > ul > li {border-bottom:1px solid #E3D5CA; position:relative;}
