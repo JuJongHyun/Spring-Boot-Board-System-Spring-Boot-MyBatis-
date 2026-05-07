@@ -19,7 +19,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         MemberResponse member = (MemberResponse) session.getAttribute("loginMember");
 
         // 2. 회원 정보 체크
-        if (member == null || member.getDeleteYn() == true) {
+        if (member == null || Boolean.TRUE.equals(member.getDeleteYn())) {
             response.sendRedirect("/login.do");
             return false;
         }

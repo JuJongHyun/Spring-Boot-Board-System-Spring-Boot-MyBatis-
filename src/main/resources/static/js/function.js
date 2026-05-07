@@ -1,4 +1,18 @@
 /**
+ * XSS 방지용 HTML 이스케이프
+ */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+
+/**
  * 문자열의 마지막(끝) 문자의 종성 포함 여부 확인
  * @param value - Target String
  * @returns 종성 포함 여부

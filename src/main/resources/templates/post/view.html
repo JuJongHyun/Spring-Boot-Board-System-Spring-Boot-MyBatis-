@@ -138,7 +138,7 @@
                             <span class="icons">
                                 <i class="fas fa-folder-open"></i>
                             </span>
-                            ${row.originalName}
+                            ${escapeHtml(row.originalName)}
                         </a>
                     `;
                 });
@@ -321,10 +321,10 @@
                         <div>
                             <span class="writer_img"><img src="/images/default_profile.png" width="30" height="30" alt="기본 프로필 이미지"/></span>
                             <p class="writer">
-                                <em>${row.writer}</em>
+                                <em>${escapeHtml(row.writer)}</em>
                                 <span class="date">${dayjs(row.createdDate).format('YYYY-MM-DD HH:mm')}</span>
                             </p>
-                            <div class="cont"><div class="txt_con">${row.content}</div></div>
+                            <div class="cont"><div class="txt_con">${escapeHtml(row.content)}</div></div>
                             <p class="func_btns">
                                 <button type="button" onclick="openCommentUpdatePopup(${row.id});" class="btns"><span class="icons icon_modify">수정</span></button>
                                 <button type="button" onclick="deleteComment(${row.id});" class="btns"><span class="icons icon_del">삭제</span></button>

@@ -146,7 +146,11 @@
         const li = document.createElement('li');
         li.className = 'noti_item';
         li.dataset.id = n.id;
-        li.innerHTML = '<a href="/post/view.do?id=' + n.postId + '" onclick="readNoti(event,' + n.id + ')">' + n.message + '</a>';
+        const a = document.createElement('a');
+        a.href = '/post/view.do?id=' + Number(n.postId);
+        a.addEventListener('click', function(e) { readNoti(e, n.id); });
+        a.textContent = n.message;
+        li.appendChild(a);
         ul.insertBefore(li, ul.firstChild);
     }
 
