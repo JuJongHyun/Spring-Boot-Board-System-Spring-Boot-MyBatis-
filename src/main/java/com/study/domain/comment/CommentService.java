@@ -57,6 +57,10 @@ public class CommentService {
         return id;
     }
 
+    public int countAllComments() {
+        return commentMapper.countAll();
+    }
+
     /**
      * 댓글 리스트 조회
      * @param params - search conditions

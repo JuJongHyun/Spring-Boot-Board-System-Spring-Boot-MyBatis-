@@ -1,11 +1,17 @@
 package com.study.domain.member;
 
+import com.study.common.dto.SearchDTO;
 import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
+import com.study.common.paging.Pagination;
+import com.study.common.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -105,6 +111,35 @@ public class MemberService {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
         memberMapper.updateNotification(memberId, params.isCommentNotiYn(), params.isReplyNotiYn());
+    }
+
+    // ── 관리자용 ──────────────────────────────────────────
+
+    public int countActiveMembers() {
+        return memberMapper.countActive();
+    }
+
+    public int countTodaySignups() {
+        return memberMapper.countToday();
+    }
+
+    public PagingResponse<MemberResponse> findAllMembersForAdmin(SearchDTO params) {
+        int count = memberMapper.countForAdmin(params);
+        if (count < 1) {
+            return new PagingResponse<>(Collections.emptyList(), null);
+        }
+        Pagination pagination = new Pagination(count, params);
+        params.setPagination(pagination);
+        List<MemberResponse> list = memberMapper.findAllForAdmin(params);
+        return new PagingResponse<>(list, pagination);
+    }
+
+    @Transactional
+    public void changeRole(Long memberId, MemberRole role) {
+        if (memberMapper.findById(memberId) == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        memberMapper.updateRole(memberId, role);
     }
 
     /**

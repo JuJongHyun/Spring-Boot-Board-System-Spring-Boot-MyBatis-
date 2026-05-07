@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +68,18 @@ public class PostService {
      */
     @Transactional
     public Long deletePost(final Long id) {
+        List<FileResponse> files = fileService.findAllFileByPostId(id);
+        if (!files.isEmpty()) {
+            List<Long> fileIds = files.stream().map(FileResponse::getId).collect(Collectors.toList());
+            fileUtils.deleteFiles(files);
+            fileService.deleteAllFileByIds(fileIds);
+        }
         postMapper.deleteById(id);
         return id;
+    }
+
+    public int countAllPosts() {
+        return postMapper.countAll();
     }
 
     /**

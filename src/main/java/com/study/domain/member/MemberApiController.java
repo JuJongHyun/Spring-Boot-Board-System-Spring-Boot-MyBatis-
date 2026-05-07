@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 @Tag(name = "Member", description = "회원 API")
@@ -28,6 +29,13 @@ public class MemberApiController {
 
     @Value("${file.upload-path}")
     private String uploadPath;
+
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+        "image/jpeg", "image/png", "image/gif", "image/webp"
+    );
+    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(
+        ".jpg", ".jpeg", ".png", ".gif", ".webp"
+    );
 
     @Operation(summary = "회원가입")
     @PostMapping("/members")
@@ -82,11 +90,20 @@ public class MemberApiController {
             HttpSession session) throws IOException {
         MemberResponse loginMember = getLoginMember(session);
 
-        String ext = "";
-        String originalName = file.getOriginalFilename();
-        if (originalName != null && originalName.contains(".")) {
-            ext = originalName.substring(originalName.lastIndexOf("."));
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
+
+        String originalName = file.getOriginalFilename();
+        String ext = "";
+        if (originalName != null && originalName.contains(".")) {
+            ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+        }
+        if (!ALLOWED_IMAGE_EXTENSIONS.contains(ext)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+
         String savedName = UUID.randomUUID() + ext;
 
         File dir = new File(uploadPath + "/profile");
