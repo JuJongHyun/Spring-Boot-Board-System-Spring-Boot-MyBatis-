@@ -10,7 +10,7 @@
                 <div class="noti_wrap">
                     <button class="noti_btn" onclick="toggleNotiPanel()" type="button" title="알림">
                         <i class="fas fa-bell"></i>
-                        <i id="noti_badge" class="noti_badge"></i>
+                        <span id="noti_badge" class="noti_badge"></span>
                     </button>
                     <div id="noti_panel" class="noti_panel">
                         <div class="noti_panel_head">
@@ -106,7 +106,8 @@
 
     window.toggleNotiPanel = function () {
         const panel = document.getElementById('noti_panel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        const isHidden = getComputedStyle(panel).display === 'none';
+        panel.style.display = isHidden ? 'block' : 'none';
     };
 
     document.addEventListener('click', function (e) {
