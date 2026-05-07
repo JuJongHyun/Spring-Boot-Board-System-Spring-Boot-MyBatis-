@@ -39,12 +39,18 @@ public class SecurityConfig {
             // CSRF 비활성화 (AJAX 기반 API + 세션 인증 구조에 적합)
             .csrf(csrf -> csrf.disable())
 
+            // HTTP 보안 헤더
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+                .contentTypeOptions(options -> {})
+            )
+
             // URL 접근 권한
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/profile-images/**").permitAll()
-                // Swagger
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // Swagger - 관리자만 접근
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").hasRole("ADMIN")
                 // 인증 없이 접근 가능한 페이지/API
                 .requestMatchers("/login.do", "/login", "/logout").permitAll()
                 .requestMatchers("/api/v1/members", "/api/v1/members/check-id").permitAll()

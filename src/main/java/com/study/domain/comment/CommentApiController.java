@@ -26,6 +26,7 @@ public class CommentApiController {
         MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
         if (loginMember != null) {
             params.setMemberId(loginMember.getId());
+            params.setWriter(loginMember.getName());
         }
         Long id = commentService.saveComment(params);
         return commentService.findCommentById(id);

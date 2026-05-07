@@ -235,7 +235,7 @@
                 const params = {
                     postId : postId,
                     content : content.value,
-                    writer : '홍길동'
+                    writer : [[ ${session.loginMember.name} ]]
                 }
 
                 callApi(uri, 'post', params);
