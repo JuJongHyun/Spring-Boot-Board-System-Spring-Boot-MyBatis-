@@ -2,18 +2,28 @@ package com.study.domain.comment;
 
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
+import com.study.domain.member.MemberResponse;
+import com.study.domain.member.MemberService;
+import com.study.domain.notification.NotificationService;
+import com.study.domain.post.PostResponse;
+import com.study.domain.post.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final PostService postService;
+    private final MemberService memberService;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 저장
@@ -23,7 +33,26 @@ public class CommentService {
     @Transactional
     public Long saveComment(final CommentRequest params) {
         commentMapper.save(params);
+        sendNotification(params);
         return params.getId();
+    }
+
+    private void sendNotification(CommentRequest params) {
+        try {
+            PostResponse post = postService.findPostById(params.getPostId());
+            if (post == null || post.getMemberId() == null) return;
+            if (post.getMemberId().equals(params.getMemberId())) return; // 본인 댓글 제외
+
+            MemberResponse receiver = memberService.findMemberById(post.getMemberId());
+            if (receiver == null || !Boolean.TRUE.equals(receiver.getCommentNotiYn())) return;
+
+            notificationService.notify(
+                receiver.getId(), params.getMemberId(),
+                post.getId(), post.getTitle(), params.getWriter()
+            );
+        } catch (Exception e) {
+            log.warn("알림 발송 실패 - postId: {}, error: {}", params.getPostId(), e.getMessage());
+        }
     }
 
     /**

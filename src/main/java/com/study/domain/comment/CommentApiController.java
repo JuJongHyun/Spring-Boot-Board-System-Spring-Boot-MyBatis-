@@ -1,9 +1,11 @@
 package com.study.domain.comment;
 
 import com.study.common.paging.PagingResponse;
+import com.study.domain.member.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,12 @@ public class CommentApiController {
     @PostMapping("/{postId}/comments")
     public CommentResponse saveComment(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @RequestBody CommentRequest params) {
+            @RequestBody CommentRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        if (loginMember != null) {
+            params.setMemberId(loginMember.getId());
+        }
         Long id = commentService.saveComment(params);
         return commentService.findCommentById(id);
     }

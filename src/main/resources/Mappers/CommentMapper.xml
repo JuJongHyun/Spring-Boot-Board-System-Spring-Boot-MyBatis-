@@ -7,6 +7,7 @@
     <sql id="commentColumns">
         id
         , post_id
+        , member_id
         , content
         , writer
         , delete_yn
@@ -21,6 +22,7 @@
         ) VALUE (
             #{id}
             , #{postId}
+            , #{memberId}
             , #{content}
             , #{writer}
             , 0

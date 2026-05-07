@@ -6,6 +6,7 @@
     <!-- tb_post 테이블 전체 컬럼 -->
     <sql id="postColumns">
         id
+        , member_id
         , title
         , content
         , writer
@@ -53,6 +54,7 @@
         <include refid="postColumns" />
         ) VALUES (
         #{id}
+        , #{memberId}
         , #{title}
         , #{content}
         , #{writer}

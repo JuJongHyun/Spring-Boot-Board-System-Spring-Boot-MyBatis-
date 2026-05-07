@@ -8,6 +8,8 @@ import com.study.common.paging.PagingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.study.domain.member.MemberResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +42,11 @@ public class PostApiController {
 
     @Operation(summary = "게시글 생성", description = "새 게시글을 생성합니다. 파일 첨부 시 multipart/form-data 사용.")
     @PostMapping
-    public ResponseEntity<ApiResponse<Long>> savePost(@ModelAttribute PostRequest params) {
+    public ResponseEntity<ApiResponse<Long>> savePost(@ModelAttribute PostRequest params, HttpSession session) {
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        if (loginMember != null) {
+            params.setMemberId(loginMember.getId());
+        }
         Long id = postService.savePost(params);
         return ResponseEntity.status(201).body(ApiResponse.created(id));
     }

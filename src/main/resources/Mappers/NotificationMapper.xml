@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.domain.notification.NotificationMapper">
+
+    <insert id="save" parameterType="com.study.domain.notification.NotificationResponse">
+        INSERT INTO tb_notification (receiver_id, sender_id, post_id, type, message, read_yn, created_date)
+        VALUES (#{receiverId}, #{senderId}, #{postId}, #{type}, #{message}, 0, NOW())
+    </insert>
+
+    <select id="findUnreadByReceiverId" resultType="com.study.domain.notification.NotificationResponse">
+        SELECT id, receiver_id, sender_id, post_id, type, message, read_yn, created_date
+        FROM tb_notification
+        WHERE receiver_id = #{receiverId}
+          AND read_yn = 0
+        ORDER BY id DESC
+    </select>
+
+    <update id="markAsRead">
+        UPDATE tb_notification SET read_yn = 1 WHERE id = #{id}
+    </update>
+
+    <update id="markAllAsRead">
+        UPDATE tb_notification SET read_yn = 1
+        WHERE receiver_id = #{receiverId} AND read_yn = 0
+    </update>
+
+    <select id="countUnread" resultType="int">
+        SELECT COUNT(*) FROM tb_notification
+        WHERE receiver_id = #{receiverId} AND read_yn = 0
+    </select>
+
+</mapper>

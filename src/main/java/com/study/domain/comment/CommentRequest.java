@@ -1,11 +1,14 @@
 package com.study.domain.comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 // 댓글 요청
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentRequest {
 
@@ -13,4 +16,7 @@ public class CommentRequest {
     private Long postId;        // 게시글 번호 (FK)
     private String content;     // 내용
     private String writer;      // 작성자
+
+    @JsonIgnore
+    private Long memberId;      // 작성자 회원 번호 (세션에서 주입, 클라이언트 전송 불가)
 }

@@ -3,6 +3,8 @@ package com.study.domain.post;
 import com.study.common.dto.MessageDTO;
 import com.study.common.dto.SearchDTO;
 import com.study.common.paging.PagingResponse;
+import com.study.domain.member.MemberResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +32,11 @@ public class PostController {
 
     // 신규 게시글 생성
     @PostMapping("/save.do")
-    public String savePost(final PostRequest params, Model model) {
+    public String savePost(final PostRequest params, Model model, HttpSession session) {
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        if (loginMember != null) {
+            params.setMemberId(loginMember.getId());
+        }
         postService.savePost(params);
         MessageDTO message = new MessageDTO("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
         return showMessageAndRedirect(message, model);

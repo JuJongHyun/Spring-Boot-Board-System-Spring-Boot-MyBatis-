@@ -12,6 +12,7 @@ import java.util.List;
 public class PostRequest {
 
     private Long id;                                            // PK
+    private Long memberId;                                      // 작성자 회원 번호 (FK)
     private String title;                                       // 제목
     private String content;                                     // 내용
     private String writer;                                      // 작성자
