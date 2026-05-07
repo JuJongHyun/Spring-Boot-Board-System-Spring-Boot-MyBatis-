@@ -21,7 +21,9 @@ nav > ul > li.has_sub > a::after, .menu_toggle > span,
 header * {box-sizing:border-box;}
 header {position:relative; z-index:1;}
 header .head {
-    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
     border-bottom:2px solid #E3D5CA;
     padding:12px 20px;
     background:#fff;
@@ -32,12 +34,12 @@ header .head h1 {
     font-size:17px;
     font-weight:600;
     letter-spacing:-0.3px;
-    float:left;
 }
 header .head h1 i {color:#D7BDB0; font-size:12px; font-weight:400;}
-header .head .top_menu {float:right;}
-header .head .top_menu > div {display:inline-block; font-size:13px;}
+header .head .top_menu {display:flex; align-items:center;}
+header .head .top_menu > div {display:flex; align-items:center; font-size:13px;}
 header .head .top_menu > div i {font-size:12px; color:#fff;}
+header .head .top_menu .noti_btn i {font-size:14px; color:#fff; line-height:34px;}
 header .head .top_menu > div button {
     background:#E3D5CA;
     border:0;
@@ -60,7 +62,6 @@ header .head .top_menu > div.login_user strong i {font-size:16px; vertical-align
     transition:background 0.2s; position:relative;
 }
 .noti_btn:hover {background:#D7BDB0;}
-.noti_btn i {font-size:14px; color:#fff; line-height:34px;}
 .noti_badge {
     display:none; position:absolute; top:-5px; right:-5px;
     background:#c55a5a; color:#fff; border-radius:50%;
