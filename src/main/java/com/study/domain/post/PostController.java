@@ -2,6 +2,7 @@ package com.study.domain.post;
 
 import com.study.common.dto.MessageDTO;
 import com.study.common.dto.SearchDTO;
+import com.study.common.exception.BusinessException;
 import com.study.common.paging.PagingResponse;
 import com.study.domain.member.MemberRole;
 import com.study.domain.member.MemberResponse;
@@ -73,7 +74,12 @@ public class PostController {
     @PostMapping("/update.do")
     public String updatePost(final PostRequest params, final SearchDTO queryParams, Model model, HttpSession session) {
         MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
-        postService.updatePost(params, loginMember.getId(), MemberRole.ADMIN == loginMember.getRole());
+        try {
+            postService.updatePost(params, loginMember.getId(), MemberRole.ADMIN == loginMember.getRole());
+        } catch (BusinessException e) {
+            MessageDTO error = new MessageDTO(e.getErrorCode().getMessage(), "/post/list.do", RequestMethod.GET, null);
+            return showMessageAndRedirect(error, model);
+        }
         MessageDTO message = new MessageDTO("게시글 수정이 완료되었습니다.", "/post/list.do", RequestMethod.GET, queryParamsToMap(queryParams));
         return showMessageAndRedirect(message, model);
     }
@@ -82,7 +88,12 @@ public class PostController {
     @PostMapping("/delete.do")
     public String deletePost(@RequestParam final long id, final SearchDTO queryParams, Model model, HttpSession session) {
         MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
-        postService.deletePost(id, loginMember.getId(), MemberRole.ADMIN == loginMember.getRole());
+        try {
+            postService.deletePost(id, loginMember.getId(), MemberRole.ADMIN == loginMember.getRole());
+        } catch (BusinessException e) {
+            MessageDTO error = new MessageDTO(e.getErrorCode().getMessage(), "/post/list.do", RequestMethod.GET, null);
+            return showMessageAndRedirect(error, model);
+        }
         MessageDTO message = new MessageDTO("게시글 삭제가 완료되었습니다.", "/post/list.do", RequestMethod.GET, queryParamsToMap(queryParams));
         return showMessageAndRedirect(message, model);
     }
