@@ -16,7 +16,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         MemberResponse member = memberMapper.findByLoginId(loginId);
         if (member == null || Boolean.TRUE.equals(member.getDeleteYn())) {
-            throw new UsernameNotFoundException("존재하지 않는 계정입니다: " + loginId);
+            throw new UsernameNotFoundException("Invalid credentials");
         }
         return new CustomUserDetails(member);
     }
