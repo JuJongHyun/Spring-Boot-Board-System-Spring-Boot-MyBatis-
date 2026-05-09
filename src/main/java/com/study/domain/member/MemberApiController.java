@@ -3,6 +3,7 @@ package com.study.domain.member;
 import com.study.common.dto.ApiResponse;
 import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
+import com.study.domain.notification.NotificationUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

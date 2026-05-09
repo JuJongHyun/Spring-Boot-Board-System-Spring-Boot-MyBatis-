@@ -3,6 +3,7 @@ package com.study.domain.member;
 import com.study.common.dto.SearchDTO;
 import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
+import com.study.domain.notification.NotificationUpdateRequest;
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
