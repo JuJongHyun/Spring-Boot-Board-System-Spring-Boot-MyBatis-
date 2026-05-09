@@ -3,10 +3,12 @@ package com.study.domain.post;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled("실DB 연결 필요 — 로컬 환경에서 수동 실행")
 @SpringBootTest
 public class PostMapperTest {
 
