@@ -19,7 +19,7 @@
     <insert id="save" parameterType="com.study.domain.comment.CommentRequest" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_comment (
             <include refid="commentColumns" />
-        ) VALUE (
+        ) VALUES (
             #{id}
             , #{postId}
             , #{memberId}

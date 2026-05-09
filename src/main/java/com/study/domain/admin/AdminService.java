@@ -54,9 +54,6 @@ public class AdminService {
 
     @Transactional
     public void deletePost(Long postId) {
-        if (postService.findPostById(postId) == null) {
-            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
-        }
-        postService.deletePost(postId);
+        postService.deletePost(postId, null, true); // 관리자 삭제 — 소유권 검증 생략
     }
 }

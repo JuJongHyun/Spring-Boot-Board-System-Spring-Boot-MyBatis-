@@ -1,5 +1,7 @@
 package com.study.domain.comment;
 
+import com.study.common.exception.BusinessException;
+import com.study.common.exception.ErrorCode;
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
 import com.study.domain.member.MemberResponse;
@@ -70,7 +72,14 @@ public class CommentService {
      * @return PK
      */
     @Transactional
-    public Long updateComment(final CommentRequest params) {
+    public Long updateComment(final CommentRequest params, final Long requesterId, final boolean isAdmin) {
+        CommentResponse comment = commentMapper.findById(params.getId());
+        if (comment == null) {
+            throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+        if (!isAdmin && !comment.getMemberId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
         commentMapper.update(params);
         return params.getId();
     }
@@ -81,7 +90,14 @@ public class CommentService {
      * @return PK
      */
     @Transactional
-    public Long deleteComment(final Long id) {
+    public Long deleteComment(final Long id, final Long requesterId, final boolean isAdmin) {
+        CommentResponse comment = commentMapper.findById(id);
+        if (comment == null) {
+            throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+        if (!isAdmin && !comment.getMemberId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
         commentMapper.deleteById(id);
         return id;
     }

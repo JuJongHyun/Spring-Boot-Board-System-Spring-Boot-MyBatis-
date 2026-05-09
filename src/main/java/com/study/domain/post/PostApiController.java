@@ -5,10 +5,11 @@ import com.study.common.dto.SearchDTO;
 import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
 import com.study.common.paging.PagingResponse;
+import com.study.domain.member.MemberRole;
+import com.study.domain.member.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.study.domain.member.MemberResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,7 @@ public class PostApiController {
         MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
         if (loginMember != null) {
             params.setMemberId(loginMember.getId());
+            params.setWriter(loginMember.getName());
         }
         Long id = postService.savePost(params);
         return ResponseEntity.status(201).body(ApiResponse.created(id));
@@ -55,21 +57,33 @@ public class PostApiController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Long>> updatePost(
             @Parameter(description = "게시글 ID") @PathVariable Long id,
-            @ModelAttribute PostRequest params) {
+            @ModelAttribute PostRequest params,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
         params.setId(id);
-        postService.updatePost(params);
+        postService.updatePost(params, loginMember.getId(), isAdmin(loginMember));
         return ResponseEntity.ok(ApiResponse.ok("게시글이 수정되었습니다.", id));
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글을 소프트 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Long>> deletePost(
-            @Parameter(description = "게시글 ID") @PathVariable Long id) {
-        PostResponse post = postService.findPostById(id);
-        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
-            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
-        }
-        postService.deletePost(id);
+            @Parameter(description = "게시글 ID") @PathVariable Long id,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        postService.deletePost(id, loginMember.getId(), isAdmin(loginMember));
         return ResponseEntity.ok(ApiResponse.ok("게시글이 삭제되었습니다.", id));
+    }
+
+    private MemberResponse getLoginMember(HttpSession session) {
+        MemberResponse member = (MemberResponse) session.getAttribute("loginMember");
+        if (member == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        return member;
+    }
+
+    private boolean isAdmin(MemberResponse member) {
+        return MemberRole.ADMIN == member.getRole();
     }
 }
