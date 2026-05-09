@@ -1,6 +1,8 @@
 package com.study.domain.post;
 
 import com.study.common.dto.SearchDTO;
+import com.study.common.exception.BusinessException;
+import com.study.common.exception.ErrorCode;
 import com.study.common.file.FileUtils;
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
@@ -51,7 +53,14 @@ public class PostService {
      * @return PK
      */
     @Transactional
-    public Long updatePost(final PostRequest params) {
+    public Long updatePost(final PostRequest params, final Long requesterId, final boolean isAdmin) {
+        PostResponse post = postMapper.findById(params.getId());
+        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
+            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
+        }
+        if (!isAdmin && !post.getMemberId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
         postMapper.update(params);
         List<FileRequest> uploadFiles = fileUtils.uploadFiles(params.getFiles());
         fileService.saveFiles(params.getId(), uploadFiles);
@@ -67,7 +76,14 @@ public class PostService {
      * @return PK
      */
     @Transactional
-    public Long deletePost(final Long id) {
+    public Long deletePost(final Long id, final Long requesterId, final boolean isAdmin) {
+        PostResponse post = postMapper.findById(id);
+        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
+            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
+        }
+        if (!isAdmin && !post.getMemberId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
         List<FileResponse> files = fileService.findAllFileByPostId(id);
         if (!files.isEmpty()) {
             List<Long> fileIds = files.stream().map(FileResponse::getId).collect(Collectors.toList());

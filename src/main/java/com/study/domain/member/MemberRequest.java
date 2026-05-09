@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class MemberRequest {
 
-    private long id;                // 회원번호 (PK)
+    private Long id;                // 회원번호 (PK)
     private String loginId;         // 로그인 ID
     private String password;        // 비밀번호
     private String name;            // 이름

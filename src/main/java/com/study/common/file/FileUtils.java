@@ -77,7 +77,7 @@ public class FileUtils {
     private String generateSaveFilename(final String filename) {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String extension = StringUtils.getFilenameExtension(filename);
-        return uuid + "." + extension;
+        return (extension != null && !extension.isEmpty()) ? uuid + "." + extension : uuid;
     }
 
     /**
