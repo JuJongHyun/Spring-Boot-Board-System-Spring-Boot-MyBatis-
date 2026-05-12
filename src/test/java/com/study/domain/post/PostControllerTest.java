@@ -41,6 +41,7 @@ class PostControllerTest {
     void openPostView_withDeletedPost_shouldRedirectToList() {
         PostService postService = mock(PostService.class);
         PostController controller = new PostController(postService);
+        HttpSession session = mock(HttpSession.class);
         Model model = mock(Model.class);
         when(model.addAttribute(anyString(), any())).thenReturn(model);
 
@@ -48,7 +49,7 @@ class PostControllerTest {
         when(deletedPost.getDeleteYn()).thenReturn(Boolean.TRUE);
         when(postService.findPostById(1L)).thenReturn(deletedPost);
 
-        String viewName = controller.openPostView(1L, model);
+        String viewName = controller.openPostView(1L, model, session);
 
         assertThat(viewName)
                 .as("삭제된 게시글은 messageRedirect로 이동해야 함")
@@ -61,12 +62,13 @@ class PostControllerTest {
     void openPostView_withNullPost_shouldRedirectToList() {
         PostService postService = mock(PostService.class);
         PostController controller = new PostController(postService);
+        HttpSession session = mock(HttpSession.class);
         Model model = mock(Model.class);
         when(model.addAttribute(anyString(), any())).thenReturn(model);
 
         when(postService.findPostById(99L)).thenReturn(null);
 
-        String viewName = controller.openPostView(99L, model);
+        String viewName = controller.openPostView(99L, model, session);
 
         assertThat(viewName)
                 .as("존재하지 않는 게시글은 messageRedirect로 이동해야 함")
@@ -115,6 +117,7 @@ class PostControllerTest {
     void openPostView_withValidPost_shouldIncreaseViewCountAndReturnView() {
         PostService postService = mock(PostService.class);
         PostController controller = new PostController(postService);
+        HttpSession session = mock(HttpSession.class);
         Model model = mock(Model.class);
         when(model.addAttribute(anyString(), any())).thenReturn(model);
 
@@ -122,7 +125,7 @@ class PostControllerTest {
         when(validPost.getDeleteYn()).thenReturn(Boolean.FALSE);
         when(postService.findPostById(1L)).thenReturn(validPost);
 
-        String viewName = controller.openPostView(1L, model);
+        String viewName = controller.openPostView(1L, model, session);
 
         assertThat(viewName).isEqualTo("post/view");
         verify(postService).increaseViewCount(1L);

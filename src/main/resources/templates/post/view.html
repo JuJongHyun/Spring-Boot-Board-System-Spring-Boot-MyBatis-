@@ -50,8 +50,10 @@
                     </tbody>
                 </table>
                 <p class="btn_set">
-                    <button type="button" onclick="goWritePage();" class="btns btn_bdr4 btn_mid">수정</button>
-                    <button type="button" onclick="deletePost();" class="btns btn_bdr1 btn_mid">삭제</button>
+                    <th:block th:if="${isOwner}">
+                        <button type="button" onclick="goWritePage();" class="btns btn_bdr4 btn_mid">수정</button>
+                        <button type="button" onclick="deletePost();" class="btns btn_bdr1 btn_mid">삭제</button>
+                    </th:block>
                     <button type="button" onclick="goListPage();" class="btns btn_bdr3 btn_mid">뒤로</button>
                 </p>
 
@@ -167,8 +169,8 @@
                 }
 
                 const response = getJson(uri, params);
-                const pagination = response.pagination;
-                drawComments(response.list);
+                const pagination = response.data.pagination;
+                drawComments(response.data.list);
                 drawPage(pagination, page);
             }
 
@@ -252,8 +254,8 @@
                 const postId = [[ ${post.id} ]];
                 const uri = `/posts/${postId}/comments/${id}`;
                 const response = getJson(uri);
-                document.getElementById('modalWriter').value = response.writer;
-                document.getElementById('modalContent').value = response.content;
+                document.getElementById('modalWriter').value = response.data.writer;
+                document.getElementById('modalContent').value = response.data.content;
                 document.getElementById('commentUpdateBtn').setAttribute('onclick', `updateComment(${id})`);
                 layerPop('commentUpdatePopup');
             }

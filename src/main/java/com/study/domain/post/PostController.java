@@ -59,7 +59,7 @@ public class PostController {
 
     // 게시글 상세 페이지
     @GetMapping("/view.do")
-    public String openPostView(@RequestParam final Long id, Model model) {
+    public String openPostView(@RequestParam final Long id, Model model, HttpSession session) {
         PostResponse post = postService.findPostById(id);
         if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
             MessageDTO message = new MessageDTO("존재하지 않는 게시글입니다.", "/post/list.do", RequestMethod.GET, null);
@@ -67,6 +67,11 @@ public class PostController {
         }
         postService.increaseViewCount(id);
         model.addAttribute("post", post);
+
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        boolean isOwner = loginMember != null && post.getMemberId() != null &&
+                (post.getMemberId().equals(loginMember.getId()) || MemberRole.ADMIN == loginMember.getRole());
+        model.addAttribute("isOwner", isOwner);
         return "post/view";
     }
 
