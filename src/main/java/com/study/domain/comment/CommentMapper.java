@@ -40,7 +40,14 @@ public interface CommentMapper {
     List<CommentResponse> findAll(CommentSearchDTO params);
 
     /**
-     * 댓글 수 카운팅
+     * 대댓글 리스트 조회
+     * @param parentId - 부모 댓글 PK
+     * @return 대댓글 리스트
+     */
+    List<CommentResponse> findReplies(Long parentId);
+
+    /**
+     * 댓글 수 카운팅 (최상위 댓글만)
      * @param params - search conditions
      * @return 댓글 수
      */

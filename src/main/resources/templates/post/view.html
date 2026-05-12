@@ -4,6 +4,67 @@
         <title>상세 페이지</title>
     </th:block>
 
+    <th:block layout:fragment="add-css">
+        <style>
+            .cm_reply {
+                margin-left: 44px;
+                padding-left: 14px;
+                border-left: 3px solid #E3D5CA;
+                background: #FDFAF8;
+            }
+            .reply_badge {
+                display: inline-block;
+                font-size: 11px;
+                color: #D7BDB0;
+                background: #FDF0E8;
+                border-radius: 4px;
+                padding: 1px 6px;
+                margin-right: 4px;
+                vertical-align: middle;
+            }
+            .reply_write {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                margin: 4px 0 4px 44px;
+                padding: 12px;
+                background: #FDFAF8;
+                border: 1px solid #E3D5CA;
+                border-radius: 8px;
+            }
+            .reply_write_arrow {
+                color: #D7BDB0;
+                font-size: 16px;
+                line-height: 1.6;
+                flex-shrink: 0;
+            }
+            .reply_write_inner {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .reply_write_inner textarea {
+                width: 100%;
+                min-height: 60px;
+                border: 1px solid #E3D5CA;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 13px;
+                color: #3d2f2a;
+                resize: vertical;
+                box-sizing: border-box;
+                outline: none;
+            }
+            .reply_write_inner textarea:focus { border-color: #D7BDB0; }
+            .reply_write_inner .reply_btns {
+                display: flex;
+                gap: 6px;
+                justify-content: flex-end;
+            }
+        </style>
+    </th:block>
+
     <th:block layout:fragment="content">
         <div class="page_tits">
             <h3>게시판</h3>
@@ -305,35 +366,95 @@
             }
 
 
-            // 댓글 HTML draw
-            function drawComments(list) {
+            // 단일 댓글/대댓글 HTML 생성
+            function buildCommentHtml(row, isReply) {
+                const ownerBtns = row.owner ? `
+                    <button type="button" onclick="openCommentUpdatePopup(${row.id});" class="btns"><span class="icons icon_modify">수정</span></button>
+                    <button type="button" onclick="deleteComment(${row.id});" class="btns"><span class="icons icon_del">삭제</span></button>
+                ` : '';
+                const replyBtn = !isReply
+                    ? `<button type="button" onclick="toggleReplyInput(${row.id});" class="btns"><span class="icons">답글</span></button>`
+                    : '';
+                return `
+                    <div class="${isReply ? 'cm_reply' : ''}">
+                        <span class="writer_img"><img src="/images/default_profile.png" width="30" height="30" alt="기본 프로필 이미지"/></span>
+                        <p class="writer">
+                            <em>${escapeHtml(row.writer)}</em>
+                            ${isReply ? '<span class="reply_badge">답글</span>' : ''}
+                            <span class="date">${dayjs(row.createdDate).format('YYYY-MM-DD HH:mm')}</span>
+                        </p>
+                        <div class="cont"><div class="txt_con">${escapeHtml(row.content)}</div></div>
+                        <p class="func_btns">
+                            ${replyBtn}
+                            ${ownerBtns}
+                        </p>
+                    </div>
+                `;
+            }
 
-                if ( !list.length ) {
+            // 댓글 + 대댓글 HTML draw
+            function drawComments(list) {
+                if (!list.length) {
                     document.querySelector('.cm_list').innerHTML = '<div class="cm_none"><p>등록된 댓글이 없습니다.</p></div>';
-                    return false;
+                    return;
                 }
 
-                let commentHtml = '';
-
+                let html = '';
                 list.forEach(row => {
-                    commentHtml += `
-                        <div>
-                            <span class="writer_img"><img src="/images/default_profile.png" width="30" height="30" alt="기본 프로필 이미지"/></span>
-                            <p class="writer">
-                                <em>${escapeHtml(row.writer)}</em>
-                                <span class="date">${dayjs(row.createdDate).format('YYYY-MM-DD HH:mm')}</span>
-                            </p>
-                            <div class="cont"><div class="txt_con">${escapeHtml(row.content)}</div></div>
-                            ${row.owner ? `
-                            <p class="func_btns">
-                                <button type="button" onclick="openCommentUpdatePopup(${row.id});" class="btns"><span class="icons icon_modify">수정</span></button>
-                                <button type="button" onclick="deleteComment(${row.id});" class="btns"><span class="icons icon_del">삭제</span></button>
-                            </p>` : ''}
+                    html += buildCommentHtml(row, false);
+
+                    // 기존 대댓글 렌더링
+                    if (row.replies && row.replies.length) {
+                        row.replies.forEach(reply => {
+                            html += buildCommentHtml(reply, true);
+                        });
+                    }
+
+                    // 대댓글 입력창 (기본 숨김)
+                    html += `
+                        <div id="reply-input-${row.id}" class="reply_write" style="display:none;">
+                            <span class="reply_write_arrow">↳</span>
+                            <div class="reply_write_inner">
+                                <textarea id="reply-content-${row.id}" placeholder="답글을 입력해 주세요." maxlength="300"></textarea>
+                                <div class="reply_btns">
+                                    <button type="button" class="btns btn_st3 btn_sm" onclick="saveReply(${row.id});">등록</button>
+                                    <button type="button" class="btns btn_bdr3 btn_sm" onclick="toggleReplyInput(${row.id});">취소</button>
+                                </div>
+                            </div>
                         </div>
                     `;
-                })
+                });
 
-                document.querySelector('.cm_list').innerHTML = commentHtml;
+                document.querySelector('.cm_list').innerHTML = html;
+            }
+
+            // 대댓글 입력창 토글
+            function toggleReplyInput(parentId) {
+                const el = document.getElementById('reply-input-' + parentId);
+                const isHidden = el.style.display === 'none';
+                el.style.display = isHidden ? 'flex' : 'none';
+                if (isHidden) document.getElementById('reply-content-' + parentId).focus();
+            }
+
+            // 대댓글 저장
+            function saveReply(parentId) {
+                const contentEl = document.getElementById('reply-content-' + parentId);
+                const content = contentEl.value.trim();
+                if (!content) {
+                    alert('답글을 입력해 주세요.');
+                    contentEl.focus();
+                    return;
+                }
+                const postId = [[ ${post.id} ]];
+                callApi(`/posts/${postId}/comments`, 'post', {
+                    postId   : postId,
+                    parentId : parentId,
+                    content  : content,
+                    writer   : [[ ${session.loginMember.name} ]]
+                });
+                alert('답글이 등록되었습니다.');
+                contentEl.value = '';
+                findAllComment();
             }
 
 

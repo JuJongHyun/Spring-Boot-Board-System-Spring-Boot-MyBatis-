@@ -42,16 +42,30 @@ public class CommentService {
     private void sendNotification(CommentRequest params) {
         try {
             PostResponse post = postService.findPostById(params.getPostId());
-            if (post == null || post.getMemberId() == null) return;
-            if (post.getMemberId().equals(params.getMemberId())) return; // 본인 댓글 제외
+            if (post == null) return;
 
-            MemberResponse receiver = memberService.findMemberById(post.getMemberId());
-            if (receiver == null || !Boolean.TRUE.equals(receiver.getCommentNotiYn())) return;
-
-            notificationService.notify(
-                receiver.getId(), params.getMemberId(),
-                post.getId(), post.getTitle(), params.getWriter()
-            );
+            if (params.getParentId() != null) {
+                // 대댓글: 원댓글 작성자에게 REPLY 알림
+                CommentResponse parent = commentMapper.findById(params.getParentId());
+                if (parent == null || parent.getMemberId() == null) return;
+                if (parent.getMemberId().equals(params.getMemberId())) return; // 본인 답글 제외
+                MemberResponse receiver = memberService.findMemberById(parent.getMemberId());
+                if (receiver == null || !Boolean.TRUE.equals(receiver.getReplyNotiYn())) return;
+                notificationService.notifyReply(
+                    receiver.getId(), params.getMemberId(),
+                    post.getId(), post.getTitle(), params.getWriter()
+                );
+            } else {
+                // 댓글: 게시글 작성자에게 COMMENT 알림
+                if (post.getMemberId() == null) return;
+                if (post.getMemberId().equals(params.getMemberId())) return; // 본인 댓글 제외
+                MemberResponse receiver = memberService.findMemberById(post.getMemberId());
+                if (receiver == null || !Boolean.TRUE.equals(receiver.getCommentNotiYn())) return;
+                notificationService.notify(
+                    receiver.getId(), params.getMemberId(),
+                    post.getId(), post.getTitle(), params.getWriter()
+                );
+            }
         } catch (Exception e) {
             log.warn("알림 발송 실패 - postId: {}, error: {}", params.getPostId(), e.getMessage());
         }
@@ -121,7 +135,12 @@ public class CommentService {
         Pagination pagination = new Pagination(count, params);
         params.setPagination(pagination);
         List<CommentResponse> list = commentMapper.findAll(params);
-        list.forEach(c -> c.setOwner(isAdmin || (loginMemberId != null && loginMemberId.equals(c.getMemberId()))));
+        list.forEach(c -> {
+            c.setOwner(isAdmin || (loginMemberId != null && loginMemberId.equals(c.getMemberId())));
+            List<CommentResponse> replies = commentMapper.findReplies(c.getId());
+            replies.forEach(r -> r.setOwner(isAdmin || (loginMemberId != null && loginMemberId.equals(r.getMemberId()))));
+            c.setReplies(replies);
+        });
         return new PagingResponse<>(list, pagination);
     }
 }

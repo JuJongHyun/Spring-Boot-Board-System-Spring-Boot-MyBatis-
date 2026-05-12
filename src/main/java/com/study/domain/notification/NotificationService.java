@@ -29,6 +29,20 @@ public class NotificationService {
         sseEmitterService.send(receiverId, notification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void notifyReply(Long receiverId, Long senderId, Long postId, String postTitle, String senderName) {
+        String message = "'" + postTitle + "' 게시글 댓글에 " + senderName + "님이 답글을 달았습니다.";
+        NotificationResponse notification = NotificationResponse.builder()
+                .receiverId(receiverId)
+                .senderId(senderId)
+                .postId(postId)
+                .type("REPLY")
+                .message(message)
+                .build();
+        notificationMapper.save(notification);
+        sseEmitterService.send(receiverId, notification);
+    }
+
     public List<NotificationResponse> findUnread(Long memberId) {
         return notificationMapper.findUnreadByReceiverId(memberId);
     }

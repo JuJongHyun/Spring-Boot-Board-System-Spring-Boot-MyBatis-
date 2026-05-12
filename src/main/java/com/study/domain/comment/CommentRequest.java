@@ -14,6 +14,7 @@ public class CommentRequest {
 
     private Long id;            // 댓글 번호 (PK)
     private Long postId;        // 게시글 번호 (FK)
+    private Long parentId;      // 부모 댓글 번호 (대댓글인 경우)
     private String content;     // 내용
     private String writer;      // 작성자
 

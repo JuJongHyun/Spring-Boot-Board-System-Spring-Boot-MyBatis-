@@ -7,6 +7,7 @@
     <sql id="commentColumns">
         id
         , post_id
+        , parent_id
         , member_id
         , content
         , writer
@@ -22,6 +23,7 @@
         ) VALUES (
             #{id}
             , #{postId}
+            , #{parentId}
             , #{memberId}
             , #{content}
             , #{writer}
@@ -62,7 +64,7 @@
             id = #{id}
     </update>
 
-    <!-- 댓글 리스트 조회 -->
+    <!-- 최상위 댓글 리스트 조회 (대댓글 제외) -->
     <select id="findAll" parameterType="com.study.domain.comment.CommentSearchDTO" resultType="com.study.domain.comment.CommentResponse">
         SELECT
             <include refid="commentColumns" />
@@ -72,9 +74,25 @@
             delete_yn = 0
         AND
             post_id = #{postId}
+        AND
+            parent_id IS NULL
         ORDER BY
             id DESC
         LIMIT #{pagination.limitStart}, #{recordSize}
+    </select>
+
+    <!-- 대댓글 리스트 조회 -->
+    <select id="findReplies" parameterType="long" resultType="com.study.domain.comment.CommentResponse">
+        SELECT
+            <include refid="commentColumns" />
+        FROM
+            tb_comment
+        WHERE
+            delete_yn = 0
+        AND
+            parent_id = #{value}
+        ORDER BY
+            id ASC
     </select>
 
     <!-- 전체 댓글 수 (관리자용) -->
@@ -82,7 +100,7 @@
         SELECT COUNT(*) FROM tb_comment WHERE delete_yn = 0
     </select>
 
-    <!-- 댓글 수 카운팅 -->
+    <!-- 최상위 댓글 수 카운팅 (대댓글 제외) -->
     <select id="count" parameterType="com.study.domain.comment.CommentSearchDTO" resultType="int">
         SELECT
             COUNT(*)
@@ -92,6 +110,8 @@
             delete_yn = 0
         AND
             post_id = #{postId}
+        AND
+            parent_id IS NULL
     </select>
 
 </mapper>
