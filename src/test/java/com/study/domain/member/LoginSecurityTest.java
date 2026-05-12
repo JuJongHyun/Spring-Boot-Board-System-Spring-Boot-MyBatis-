@@ -1,5 +1,6 @@
 package com.study.domain.member;
 
+import com.study.common.paging.PagingResponse;
 import com.study.config.SecurityConfig;
 import com.study.config.security.CustomUserDetails;
 import com.study.config.security.CustomUserDetailsService;
@@ -9,7 +10,10 @@ import com.study.domain.comment.CommentService;
 import com.study.domain.file.FileService;
 import com.study.domain.notification.NotificationService;
 import com.study.domain.notification.SseEmitterService;
+import com.study.domain.post.PostResponse;
 import com.study.domain.post.PostService;
+
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,14 +94,21 @@ class LoginSecurityTest {
     @Test
     @WithMockUser(username = "user01", roles = "USER")
     void 로그인_후_보호된_페이지_접근_허용() throws Exception {
-        mockMvc.perform(get("/post/list.do"))
+        when(postService.findAllPost(any())).thenReturn(
+                new PagingResponse<>(Collections.emptyList(), null));
+        mockMvc.perform(get("/post/list.do")
+                        .sessionAttr("loginMember", validUser.getMember()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void 일반_사용자_관리자_페이지_접근_거부() throws Exception {
-        mockMvc.perform(get("/admin/members"))
+        // SecurityConfig.accessDeniedHandler는 non-AJAX를 /login.do로 redirect하므로
+        // AJAX 요청으로 403을 검증한다
+        mockMvc.perform(get("/admin/members")
+                        .sessionAttr("loginMember", validUser.getMember())
+                        .header("X-Requested-With", "XMLHttpRequest"))
                 .andExpect(status().isForbidden());
     }
 
