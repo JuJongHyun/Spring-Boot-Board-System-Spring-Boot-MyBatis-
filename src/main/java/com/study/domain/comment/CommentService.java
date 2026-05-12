@@ -111,7 +111,7 @@ public class CommentService {
      * @param params - search conditions
      * @return 특정 게시글에 등록된 댓글 리스트
      */
-    public PagingResponse<CommentResponse> findAllComment(final CommentSearchDTO params) {
+    public PagingResponse<CommentResponse> findAllComment(final CommentSearchDTO params, final Long loginMemberId, final boolean isAdmin) {
 
         int count = commentMapper.count(params);
         if (count < 1) {
@@ -121,6 +121,7 @@ public class CommentService {
         Pagination pagination = new Pagination(count, params);
         params.setPagination(pagination);
         List<CommentResponse> list = commentMapper.findAll(params);
+        list.forEach(c -> c.setOwner(isAdmin || (loginMemberId != null && loginMemberId.equals(c.getMemberId()))));
         return new PagingResponse<>(list, pagination);
     }
 }

@@ -42,8 +42,12 @@ public class CommentApiController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<ApiResponse<PagingResponse<CommentResponse>>> findAllComment(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            CommentSearchDTO params) {
-        return ResponseEntity.ok(ApiResponse.ok(commentService.findAllComment(params)));
+            CommentSearchDTO params,
+            HttpSession session) {
+        MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
+        Long loginMemberId = (loginMember != null) ? loginMember.getId() : null;
+        boolean isAdmin = (loginMember != null) && isAdmin(loginMember);
+        return ResponseEntity.ok(ApiResponse.ok(commentService.findAllComment(params, loginMemberId, isAdmin)));
     }
 
     @Operation(summary = "댓글 상세 조회")

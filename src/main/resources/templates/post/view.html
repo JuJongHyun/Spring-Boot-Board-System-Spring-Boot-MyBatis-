@@ -90,8 +90,8 @@
                     </colgroup>
                     <tbody>
                         <tr>
-                            <th scope="row">작성자<span class="es">필수 입력</span></th>
-                            <td><input type="text" id="modalWriter" name="modalWriter" placeholder="작성자를 입력해 주세요." /></td>
+                            <th scope="row">작성자</th>
+                            <td><input type="text" id="modalWriter" name="modalWriter" readonly /></td>
                         </tr>
                         <tr>
                             <th scope="row">내용<span class="es">필수 입력</span></th>
@@ -272,9 +272,7 @@
             // 댓글 수정
             function updateComment(id) {
 
-                const writer = document.getElementById('modalWriter');
                 const content = document.getElementById('modalContent');
-                isValid(writer, '작성자');
                 isValid(content, '수정할 내용');
 
                 const postId = [[ ${post.id} ]];
@@ -283,7 +281,6 @@
                     id : id,
                     postId : postId,
                     content : content.value,
-                    writer : writer.value
                 }
 
                 callApi(uri, 'patch', params);
@@ -327,10 +324,11 @@
                                 <span class="date">${dayjs(row.createdDate).format('YYYY-MM-DD HH:mm')}</span>
                             </p>
                             <div class="cont"><div class="txt_con">${escapeHtml(row.content)}</div></div>
+                            ${row.owner ? `
                             <p class="func_btns">
                                 <button type="button" onclick="openCommentUpdatePopup(${row.id});" class="btns"><span class="icons icon_modify">수정</span></button>
                                 <button type="button" onclick="deleteComment(${row.id});" class="btns"><span class="icons icon_del">삭제</span></button>
-                            </p>
+                            </p>` : ''}
                         </div>
                     `;
                 })

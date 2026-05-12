@@ -49,7 +49,6 @@
         SET
             modified_date = NOW()
             , content = #{content}
-            , writer = #{writer}
         WHERE
             id = #{id}
     </update>
