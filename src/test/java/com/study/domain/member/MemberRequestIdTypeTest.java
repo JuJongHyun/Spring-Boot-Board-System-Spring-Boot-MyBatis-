@@ -1,5 +1,6 @@
 package com.study.domain.member;
 
+import com.study.domain.member.dto.MemberRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

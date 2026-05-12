@@ -1,8 +1,8 @@
 package com.study.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.domain.member.CustomUserDetails;
-import com.study.domain.member.MemberResponse;
+import com.study.config.security.CustomUserDetails;
+import com.study.domain.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

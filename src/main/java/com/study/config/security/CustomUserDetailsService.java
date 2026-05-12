@@ -1,5 +1,7 @@
-package com.study.domain.member;
+package com.study.config.security;
 
+import com.study.domain.member.MemberMapper;
+import com.study.domain.member.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,4 +1,4 @@
-package com.study.domain.admin;
+package com.study.domain.admin.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import com.study.common.dto.SearchDTO;
 import com.study.common.exception.BusinessException;
 import com.study.common.paging.PagingResponse;
 import com.study.domain.member.MemberRole;
-import com.study.domain.member.MemberResponse;
+import com.study.domain.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

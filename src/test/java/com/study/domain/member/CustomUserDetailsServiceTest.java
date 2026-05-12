@@ -1,5 +1,7 @@
 package com.study.domain.member;
 
+import com.study.config.security.CustomUserDetailsService;
+import com.study.domain.member.dto.MemberResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,4 +1,4 @@
-package com.study.interceptor;
+package com.study.global.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

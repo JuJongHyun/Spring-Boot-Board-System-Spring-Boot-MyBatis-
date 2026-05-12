@@ -1,6 +1,8 @@
 package com.study.domain.member;
 
 import com.study.common.dto.SearchDTO;
+import com.study.domain.member.dto.MemberRequest;
+import com.study.domain.member.dto.MemberResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

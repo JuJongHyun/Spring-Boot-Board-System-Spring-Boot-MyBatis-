@@ -5,7 +5,7 @@ import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
 import com.study.common.paging.PagingResponse;
 import com.study.domain.member.MemberRole;
-import com.study.domain.member.MemberResponse;
+import com.study.domain.member.dto.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

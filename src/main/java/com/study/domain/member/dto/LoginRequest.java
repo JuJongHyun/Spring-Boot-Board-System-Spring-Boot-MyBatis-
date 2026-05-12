@@ -1,4 +1,4 @@
-package com.study.domain.member;
+package com.study.domain.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

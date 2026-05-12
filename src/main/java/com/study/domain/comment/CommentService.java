@@ -4,7 +4,7 @@ import com.study.common.exception.BusinessException;
 import com.study.common.exception.ErrorCode;
 import com.study.common.paging.Pagination;
 import com.study.common.paging.PagingResponse;
-import com.study.domain.member.MemberResponse;
+import com.study.domain.member.dto.MemberResponse;
 import com.study.domain.member.MemberService;
 import com.study.domain.notification.NotificationService;
 import com.study.domain.post.PostResponse;

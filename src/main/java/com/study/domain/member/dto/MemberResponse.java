@@ -1,5 +1,7 @@
-package com.study.domain.member;
+package com.study.domain.member.dto;
 
+import com.study.domain.member.Gender;
+import com.study.domain.member.MemberRole;
 import lombok.Getter;
 
 import java.time.LocalDate;

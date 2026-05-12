@@ -1,6 +1,6 @@
-package com.study.interceptor;
+package com.study.global.interceptor;
 
-import com.study.domain.member.MemberResponse;
+import com.study.domain.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

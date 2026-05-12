@@ -1,7 +1,7 @@
 package com.study.config;
 
-import com.study.interceptor.LoggerInterceptor;
-import com.study.interceptor.LoginCheckInterceptor;
+import com.study.global.interceptor.LoggerInterceptor;
+import com.study.global.interceptor.LoginCheckInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

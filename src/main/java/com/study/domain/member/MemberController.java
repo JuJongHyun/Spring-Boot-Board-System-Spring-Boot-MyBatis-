@@ -1,5 +1,6 @@
 package com.study.domain.member;
 
+import com.study.domain.member.dto.MemberResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

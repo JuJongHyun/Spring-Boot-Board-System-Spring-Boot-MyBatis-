@@ -1,6 +1,6 @@
 package com.study.domain.post;
 
-import com.study.domain.member.MemberResponse;
+import com.study.domain.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

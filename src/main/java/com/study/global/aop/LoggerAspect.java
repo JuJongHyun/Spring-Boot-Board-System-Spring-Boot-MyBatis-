@@ -1,4 +1,4 @@
-package com.study.aop;
+package com.study.global.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

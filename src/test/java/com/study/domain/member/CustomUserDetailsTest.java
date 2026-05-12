@@ -1,5 +1,7 @@
 package com.study.domain.member;
 
+import com.study.config.security.CustomUserDetails;
+import com.study.domain.member.dto.MemberResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 

@@ -1,5 +1,7 @@
-package com.study.domain.member;
+package com.study.config.security;
 
+import com.study.domain.member.MemberRole;
+import com.study.domain.member.dto.MemberResponse;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
