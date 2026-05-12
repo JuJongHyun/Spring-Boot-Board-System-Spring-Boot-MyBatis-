@@ -6,36 +6,81 @@
 
     <th:block layout:fragment="add-css">
         <style>
-            .cm_reply {
-                margin-left: 44px;
-                padding-left: 14px;
-                border-left: 3px solid #E3D5CA;
-                background: #FDFAF8;
+            /* content.css .cm_list > div가 .cm_replies 컨테이너에 적용되는 것 차단 */
+            .cm_list > div.cm_replies {
+                border-top: 0;
+                padding: 0;
+                overflow: visible;
             }
+
+            /* 대댓글 그룹 컨테이너 */
+            .cm_replies {
+                margin-left: 44px;
+            }
+
+            /* 대댓글 단일 블록 */
+            .cm_reply {
+                position: relative;
+                border-top: 1px dashed #EDE0D8;
+                padding: 14px 56px 14px 20px;
+                background: #FDFAF8;
+                border-left: 3px solid #E3D5CA;
+                border-radius: 0 8px 8px 0;
+                margin-bottom: 2px;
+            }
+            .reply_img {
+                position: absolute;
+                top: 14px;
+                left: 20px;
+            }
+            .reply_img img {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #E3D5CA;
+            }
+            .cm_reply .writer {
+                padding: 0 0 0 36px;
+            }
+            .cm_reply .cont {
+                padding-left: 0;
+                margin-top: 6px;
+            }
+            .cm_reply .func_btns {
+                top: 12px;
+                right: 10px;
+            }
+
+            /* 답글 뱃지 */
             .reply_badge {
                 display: inline-block;
-                font-size: 11px;
-                color: #D7BDB0;
-                background: #FDF0E8;
-                border-radius: 4px;
-                padding: 1px 6px;
-                margin-right: 4px;
+                font-size: 10px;
+                color: #BFA99E;
+                background: #FBF0EA;
+                border-radius: 3px;
+                padding: 1px 5px;
+                margin-right: 5px;
                 vertical-align: middle;
+                line-height: 1.6;
             }
+
+            /* 대댓글 입력창 — cm_reply와 동일한 디자인 언어 */
             .reply_write {
                 display: flex;
                 align-items: flex-start;
                 gap: 10px;
-                margin: 4px 0 4px 44px;
-                padding: 12px;
-                background: #FDFAF8;
-                border: 1px solid #E3D5CA;
-                border-radius: 8px;
+                padding: 12px 14px;
+                background: #FBF7F4;
+                border: 1px dashed #D7BDB0;
+                border-left: 3px solid #D7BDB0;
+                border-radius: 0 8px 8px 0;
+                margin-top: 2px;
             }
             .reply_write_arrow {
-                color: #D7BDB0;
-                font-size: 16px;
-                line-height: 1.6;
+                color: #C4A49A;
+                font-size: 14px;
+                line-height: 1.8;
                 flex-shrink: 0;
             }
             .reply_write_inner {
@@ -46,17 +91,22 @@
             }
             .reply_write_inner textarea {
                 width: 100%;
-                min-height: 60px;
+                min-height: 52px;
                 border: 1px solid #E3D5CA;
                 border-radius: 6px;
-                padding: 8px;
+                padding: 8px 10px;
                 font-size: 13px;
                 color: #3d2f2a;
-                resize: vertical;
+                resize: none;
                 box-sizing: border-box;
                 outline: none;
+                background: #fff;
+                line-height: 1.5;
             }
-            .reply_write_inner textarea:focus { border-color: #D7BDB0; }
+            .reply_write_inner textarea:focus {
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 2px rgba(215,189,176,0.2);
+            }
             .reply_write_inner .reply_btns {
                 display: flex;
                 gap: 6px;
@@ -375,12 +425,15 @@
                 const replyBtn = !isReply
                     ? `<button type="button" onclick="toggleReplyInput(${row.id});" class="btns"><span class="icons">답글</span></button>`
                     : '';
+                const profileSrc = row.profileImage
+                    ? `/profile-images/${row.profileImage}`
+                    : '/images/default_profile.png';
                 return `
-                    <div class="${isReply ? 'cm_reply' : ''}">
-                        <span class="writer_img"><img src="/images/default_profile.png" width="30" height="30" alt="기본 프로필 이미지"/></span>
+                    <div class="${isReply ? 'cm_reply' : 'cm_item'}">
+                        <span class="${isReply ? 'reply_img' : 'writer_img'}"><img src="${profileSrc}" width="30" height="30" alt="프로필 이미지" style="border-radius:50%; object-fit:cover;"/></span>
                         <p class="writer">
+                            ${isReply ? '<span class="reply_badge">↳ 답글</span>' : ''}
                             <em>${escapeHtml(row.writer)}</em>
-                            ${isReply ? '<span class="reply_badge">답글</span>' : ''}
                             <span class="date">${dayjs(row.createdDate).format('YYYY-MM-DD HH:mm')}</span>
                         </p>
                         <div class="cont"><div class="txt_con">${escapeHtml(row.content)}</div></div>
@@ -403,15 +456,14 @@
                 list.forEach(row => {
                     html += buildCommentHtml(row, false);
 
-                    // 기존 대댓글 렌더링
+                    // 대댓글 + 입력창을 그룹 컨테이너로 묶어 계층 명확화
+                    let replyGroupHtml = '';
                     if (row.replies && row.replies.length) {
                         row.replies.forEach(reply => {
-                            html += buildCommentHtml(reply, true);
+                            replyGroupHtml += buildCommentHtml(reply, true);
                         });
                     }
-
-                    // 대댓글 입력창 (기본 숨김)
-                    html += `
+                    replyGroupHtml += `
                         <div id="reply-input-${row.id}" class="reply_write" style="display:none;">
                             <span class="reply_write_arrow">↳</span>
                             <div class="reply_write_inner">
@@ -423,6 +475,7 @@
                             </div>
                         </div>
                     `;
+                    html += `<div class="cm_replies">${replyGroupHtml}</div>`;
                 });
 
                 document.querySelector('.cm_list').innerHTML = html;
