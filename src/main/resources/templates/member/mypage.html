@@ -83,6 +83,55 @@
             .gender_group label { display:flex; align-items:center; gap:6px; font-size:14px; color:#3d2f2a; cursor:pointer; }
             .gender_group input[type="radio"] { accent-color:#D7BDB0; width:16px; height:16px; }
 
+            /* 비밀번호 확인 모달 */
+            .verify_overlay {
+                position:fixed; inset:0;
+                background:rgba(61,47,42,0.45);
+                backdrop-filter:blur(3px);
+                display:flex; align-items:center; justify-content:center;
+                z-index:9999;
+            }
+            .verify_modal {
+                background:#fff;
+                border-radius:20px;
+                padding:44px 40px 36px;
+                width:100%; max-width:400px;
+                box-shadow:0 16px 48px rgba(100,60,40,0.18);
+                text-align:center;
+                animation:fadeInUp 0.22s ease;
+            }
+            @keyframes fadeInUp {
+                from { opacity:0; transform:translateY(16px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
+            .verify_modal .v_icon { font-size:44px; color:#D7BDB0; margin-bottom:14px; }
+            .verify_modal h3 { font-size:20px; color:#3d2f2a; font-weight:700; margin-bottom:8px; }
+            .verify_modal p  { font-size:13px; color:#9a8880; margin-bottom:26px; line-height:1.6; }
+            .verify_modal input[type="password"] {
+                width:100%; height:46px;
+                border:1.5px solid #E3D5CA; border-radius:10px;
+                padding:0 16px; font-size:15px; color:#3d2f2a;
+                outline:none; box-sizing:border-box;
+                transition:border-color 0.2s; margin-bottom:12px;
+            }
+            .verify_modal input[type="password"]:focus { border-color:#D7BDB0; }
+            .verify_modal .v_btn {
+                width:100%; height:46px;
+                background:linear-gradient(135deg,#D7BDB0,#C7B4AC);
+                border:0; border-radius:50px;
+                font-size:15px; font-weight:600; color:#fff;
+                cursor:pointer; transition:all 0.2s;
+            }
+            .verify_modal .v_btn:hover {
+                background:linear-gradient(135deg,#C7B4AC,#B8A49C);
+                transform:translateY(-1px);
+                box-shadow:0 4px 14px rgba(215,189,176,0.4);
+            }
+            .verify_modal .v_error {
+                font-size:13px; color:#c47a7a;
+                margin-top:10px; display:none;
+            }
+
             /* 탈퇴 경고 박스 */
             .withdraw_warn {
                 display:flex; gap:14px; align-items:flex-start;
@@ -99,11 +148,24 @@
     </th:block>
 
     <th:block layout:fragment="content">
+
+        <!-- 비밀번호 확인 모달 -->
+        <div id="verifyOverlay" class="verify_overlay" th:if="${needsVerify}">
+            <div class="verify_modal">
+                <div class="v_icon"><i class="fas fa-lock"></i></div>
+                <h3>본인 확인</h3>
+                <p>마이페이지에 접근하려면<br/>비밀번호를 입력해 주세요.</p>
+                <input type="password" id="verifyPassword" placeholder="비밀번호" maxlength="30" />
+                <button type="button" class="v_btn" onclick="submitVerify();">확인</button>
+                <p class="v_error" id="verifyError"></p>
+            </div>
+        </div>
+
         <div class="page_tits">
             <h3>마이페이지</h3>
         </div>
 
-        <div class="content">
+        <div class="content" th:if="${member != null}">
 
             <!-- 프로필 카드 -->
             <div class="profile_card">
@@ -183,7 +245,6 @@
             <!-- 탭 2: 알림 설정 -->
             <section id="tab_noti" class="tab_content" style="display:none;">
                 <h4>알림 설정</h4>
-                <p class="tab_desc">알림은 현재 설정만 저장되며, 실제 발송 기능은 추후 제공될 예정입니다.</p>
                 <div class="noti_list">
                     <div class="noti_row">
                         <div class="noti_text">
@@ -272,6 +333,45 @@
     <th:block layout:fragment="script">
         <script th:inline="javascript">
         /*<![CDATA[*/
+
+            /* 비밀번호 확인 모달 */
+            (function() {
+                const overlay = document.getElementById('verifyOverlay');
+                if (!overlay) return;
+                const input = document.getElementById('verifyPassword');
+                if (input) {
+                    input.focus();
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') submitVerify();
+                    });
+                }
+            })();
+
+            function submitVerify() {
+                const password = document.getElementById('verifyPassword').value.trim();
+                const errorEl  = document.getElementById('verifyError');
+                if (!password) {
+                    errorEl.textContent = '비밀번호를 입력해 주세요.';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+                $.ajax({
+                    url: '/api/v1/members/me/verify-password',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ password: password }),
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        const res = JSON.parse(xhr.responseText);
+                        errorEl.textContent = res.message || '비밀번호가 올바르지 않습니다.';
+                        errorEl.style.display = 'block';
+                        document.getElementById('verifyPassword').value = '';
+                        document.getElementById('verifyPassword').focus();
+                    }
+                });
+            }
 
             function showTab(tabId, el) {
                 document.querySelectorAll('.tab_content').forEach(t => t.style.display = 'none');

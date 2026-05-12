@@ -24,6 +24,11 @@ public class MemberController {
 
     @GetMapping("/member/mypage.do")
     public String openMyPage(HttpSession session, Model model) {
+        Boolean verified = (Boolean) session.getAttribute("mypageVerified");
+        if (!Boolean.TRUE.equals(verified)) {
+            model.addAttribute("needsVerify", true);
+            return "member/mypage";
+        }
         MemberResponse loginMember = (MemberResponse) session.getAttribute("loginMember");
         MemberResponse member = memberService.findMemberById(loginMember.getId());
         model.addAttribute("member", member);

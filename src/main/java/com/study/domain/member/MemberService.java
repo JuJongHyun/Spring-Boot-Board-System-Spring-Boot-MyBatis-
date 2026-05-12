@@ -147,6 +147,14 @@ public class MemberService {
         memberMapper.updateRole(memberId, role);
     }
 
+    public boolean verifyPassword(Long memberId, String rawPassword) {
+        MemberResponse member = memberMapper.findById(memberId);
+        if (member == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        return passwordEncoder.matches(rawPassword, member.getPassword());
+    }
+
     /**
      * 회원탈퇴: 비밀번호 확인 후 소프트 삭제
      */

@@ -74,6 +74,25 @@ public class MemberApiController {
         return ResponseEntity.ok(ApiResponse.ok(message, available));
     }
 
+    // ── 마이페이지 접근 비밀번호 확인 ──────────────────────────────────────────
+
+    @Operation(summary = "마이페이지 비밀번호 확인", description = "마이페이지 진입 전 비밀번호를 검증하고 세션에 인증 완료를 기록합니다.")
+    @PostMapping("/members/me/verify-password")
+    public ResponseEntity<ApiResponse<Void>> verifyMypagePassword(
+            @RequestBody java.util.Map<String, String> body,
+            HttpSession session) {
+        MemberResponse loginMember = getLoginMember(session);
+        String password = body.get("password");
+        if (password == null || password.isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+        if (!memberService.verifyPassword(loginMember.getId(), password)) {
+            throw new BusinessException(ErrorCode.WRONG_PASSWORD);
+        }
+        session.setAttribute("mypageVerified", true);
+        return ResponseEntity.ok(ApiResponse.ok("인증되었습니다.", null));
+    }
+
     // ── 마이페이지 API ──────────────────────────────────────────
 
     @Operation(summary = "개인정보 변경", description = "이름, 성별, 생년월일을 변경합니다.")
