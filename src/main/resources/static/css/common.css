@@ -50,9 +50,10 @@ header .head .top_menu > div button {
     transition:background 0.2s;
 }
 header .head .top_menu > div button:hover {background:#D7BDB0;}
-header .head .top_menu > div.login_user {margin-right:16px;}
-header .head .top_menu > div.login_user strong {color:#5a4a44;}
+header .head .top_menu > div.login_user {margin-right:16px; gap:8px; font-size:15px;}
+header .head .top_menu > div.login_user strong {color:#5a4a44; font-size:15px;}
 header .head .top_menu > div.login_user strong i {font-size:16px; vertical-align:bottom; color:#D7BDB0;}
+header .head .top_menu > div.login_user .header_profile_img {width:28px; height:28px; border-radius:50%; object-fit:cover;}
 
 /* ── 알림 벨 ─────────────────────────────── */
 .noti_wrap {position:relative; display:inline-block; margin-right:10px; vertical-align:middle;}

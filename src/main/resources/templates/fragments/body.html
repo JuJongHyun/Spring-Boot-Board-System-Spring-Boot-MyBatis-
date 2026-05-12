@@ -6,7 +6,10 @@
         <div class="head">
             <h1>게시판 프로젝트</h1>
             <div th:if="${session.loginMember != null}" class="top_menu">
-                <div class="login_user"><strong><i class="far fa-user-circle"></i> [[ ${session.loginMember.name} ]]</strong> 님, 환영합니다 🌸</div>
+                <div class="login_user">
+                    <img th:src="${session.loginMember.profileImage != null ? '/profile-images/' + session.loginMember.profileImage : '/images/default_profile.png'}" class="header_profile_img" alt="프로필" />
+                    <strong>[[ ${session.loginMember.name} ]]</strong> 님
+                </div>
                 <div class="noti_wrap">
                     <button class="noti_btn" onclick="toggleNotiPanel()" type="button" title="알림">
                         <i class="fas fa-bell"></i>
