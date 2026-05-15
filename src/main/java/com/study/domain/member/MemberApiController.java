@@ -46,6 +46,9 @@ public class MemberApiController {
     @Operation(summary = "회원가입")
     @PostMapping("/members")
     public ResponseEntity<ApiResponse<Long>> saveMember(@RequestBody MemberRequest params) {
+        if (params.getPassword() == null || params.getPassword().length() < 8) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
         if (memberService.countMemberByLoginId(params.getLoginId()) > 0) {
             throw new BusinessException(ErrorCode.DUPLICATE_LOGIN_ID);
         }

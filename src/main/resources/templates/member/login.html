@@ -79,7 +79,7 @@
                 </tr>
                 <tr>
                     <th scope="row">비밀번호<span class="es">필수 입력</span></th>
-                    <td><input type="password" name="password" placeholder="비밀번호" maxlength="30" /></td>
+                    <td><input type="password" name="password" placeholder="비밀번호 (8자 이상)" maxlength="30" /></td>
                 </tr>
                 <tr>
                     <th scope="row">비밀번호 재입력<span class="es">필수 입력</span></th>
@@ -182,6 +182,12 @@
 
         if (form.loginId.readOnly === false) {
             alert('아이디 중복 체크를 완료해 주세요.');
+            throw new Error();
+        }
+
+        if (form.password.value.length < 8) {
+            alert('비밀번호는 8자 이상이어야 합니다.');
+            form.password.focus();
             throw new Error();
         }
 
