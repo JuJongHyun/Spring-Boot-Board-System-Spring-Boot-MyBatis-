@@ -75,6 +75,7 @@
         tb_post
         WHERE
         id = #{value}
+        AND delete_yn = 0
     </select>
 
 

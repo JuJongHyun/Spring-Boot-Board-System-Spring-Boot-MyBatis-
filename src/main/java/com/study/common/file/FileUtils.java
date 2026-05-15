@@ -1,5 +1,7 @@
 package com.study.common.file;
 
+import com.study.common.exception.BusinessException;
+import com.study.common.exception.ErrorCode;
 import com.study.domain.file.FileRequest;
 import com.study.domain.file.FileResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -23,6 +26,25 @@ public class FileUtils {
 
     @Value("${file.upload-path}")
     private String uploadPath;
+
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+        "jpg", "jpeg", "png", "gif", "webp",
+        "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+        "txt", "zip"
+    );
+
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+        "image/jpeg", "image/png", "image/gif", "image/webp",
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "text/plain",
+        "application/zip"
+    );
 
     /**
      * 다중 파일 업로드
@@ -51,6 +73,8 @@ public class FileUtils {
             return null;
         }
 
+        validateFile(multipartFile);
+
         String saveName = generateSaveFilename(multipartFile.getOriginalFilename());
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString();
         String uploadPath = getUploadPath(today) + File.separator + saveName;
@@ -67,6 +91,21 @@ public class FileUtils {
                 .saveName(saveName)
                 .size(multipartFile.getSize())
                 .build();
+    }
+
+    private void validateFile(final MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+
+        String originalName = file.getOriginalFilename();
+        String ext = (originalName != null && originalName.contains("."))
+            ? originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase()
+            : "";
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
     }
 
     /**
@@ -108,6 +147,20 @@ public class FileUtils {
             dir.mkdirs();
         }
         return dir.getPath();
+    }
+
+    /**
+     * 업로드 롤백용 — FileRequest 목록의 파일을 디스크에서 삭제
+     * @param files - 업로드된 FileRequest 리스트
+     */
+    public void deleteFileRequests(final List<FileRequest> files) {
+        if (CollectionUtils.isEmpty(files)) {
+            return;
+        }
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+        for (FileRequest file : files) {
+            deleteFile(today, file.getSaveName());
+        }
     }
 
     /**

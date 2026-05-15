@@ -47,9 +47,5 @@ public interface PostMapper {
 
     int countAll();
 
-    /**
-     * 게시글 조회 카운팅
-     * @return 조회 수
-     */
-    int increaseViewCount(Long id);
+    void increaseViewCount(Long id);
 }

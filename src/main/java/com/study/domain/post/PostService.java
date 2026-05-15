@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,8 +34,15 @@ public class PostService {
     @Transactional
     public Long savePost(final PostRequest params) {
         postMapper.save(params);
-        List<FileRequest> files = fileUtils.uploadFiles(params.getFiles());
-        fileService.saveFiles(params.getId(), files);
+        List<FileRequest> uploadedFiles = new ArrayList<>();
+        try {
+            uploadedFiles = fileUtils.uploadFiles(params.getFiles());
+            fileService.saveFiles(params.getId(), uploadedFiles);
+        } catch (Exception e) {
+            // 디스크에 저장된 파일을 롤백 전에 정리 (DB 롤백은 @Transactional이 처리)
+            fileUtils.deleteFileRequests(uploadedFiles);
+            throw e;
+        }
         return params.getId();
     }
 
@@ -55,7 +63,7 @@ public class PostService {
     @Transactional
     public Long updatePost(final PostRequest params, final Long requesterId, final boolean isAdmin) {
         PostResponse post = postMapper.findById(params.getId());
-        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
+        if (post == null) {
             throw new BusinessException(ErrorCode.POST_NOT_FOUND);
         }
         if (!isAdmin && !post.getMemberId().equals(requesterId)) {
@@ -78,7 +86,7 @@ public class PostService {
     @Transactional
     public Long deletePost(final Long id, final Long requesterId, final boolean isAdmin) {
         PostResponse post = postMapper.findById(id);
-        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
+        if (post == null) {
             throw new BusinessException(ErrorCode.POST_NOT_FOUND);
         }
         if (!isAdmin && !post.getMemberId().equals(requesterId)) {

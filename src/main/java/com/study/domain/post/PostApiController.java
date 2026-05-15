@@ -35,7 +35,7 @@ public class PostApiController {
     public ResponseEntity<ApiResponse<PostResponse>> findPostById(
             @Parameter(description = "게시글 ID") @PathVariable Long id) {
         PostResponse post = postService.findPostById(id);
-        if (post == null || Boolean.TRUE.equals(post.getDeleteYn())) {
+        if (post == null) {
             throw new BusinessException(ErrorCode.POST_NOT_FOUND);
         }
         return ResponseEntity.ok(ApiResponse.ok(post));
