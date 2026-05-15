@@ -33,6 +33,12 @@ public interface CommentMapper {
     void deleteById(Long id);
 
     /**
+     * 부모 댓글 삭제 시 대댓글 일괄 소프트 삭제
+     * @param parentId - 부모 댓글 PK
+     */
+    void deleteRepliesByParentId(Long parentId);
+
+    /**
      * 댓글 리스트 조회
      * @param params - search conditions
      * @return 댓글 리스트

@@ -17,6 +17,7 @@ public class CommentResponse {
     private Long memberId;                  // 작성자 회원 번호 (FK)
     private String content;                 // 내용
     private String writer;                  // 작성자
+    private String profileImage;            // 작성자 프로필 이미지 파일명 (JOIN)
     private Boolean deleteYn;               // 삭제 여부
     private LocalDateTime createdDate;      // 생성일시
     private LocalDateTime modifiedDate;     // 최종 수정일시

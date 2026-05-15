@@ -80,6 +80,7 @@ class CommentOwnershipTest {
 
         CommentRequest params = new CommentRequest();
         params.setId(5L);
+        params.setContent("수정 내용");
 
         assertThatThrownBy(() -> commentService.updateComment(params, 2L, false))
                 .isInstanceOf(BusinessException.class)

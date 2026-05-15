@@ -34,6 +34,23 @@ public class CommentService {
      */
     @Transactional
     public Long saveComment(final CommentRequest params) {
+        if (params.getContent() == null || params.getContent().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+        if (params.getParentId() != null) {
+            CommentResponse parent = commentMapper.findById(params.getParentId());
+            if (parent == null) {
+                throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND);
+            }
+            if (parent.getParentId() != null) {
+                // 대댓글의 대댓글 금지 (depth 1 제한)
+                throw new BusinessException(ErrorCode.INVALID_INPUT);
+            }
+            if (!params.getPostId().equals(parent.getPostId())) {
+                // 다른 게시글 댓글을 부모로 지정 금지
+                throw new BusinessException(ErrorCode.INVALID_INPUT);
+            }
+        }
         commentMapper.save(params);
         sendNotification(params);
         return params.getId();
@@ -87,6 +104,9 @@ public class CommentService {
      */
     @Transactional
     public Long updateComment(final CommentRequest params, final Long requesterId, final boolean isAdmin) {
+        if (params.getContent() == null || params.getContent().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
         CommentResponse comment = commentMapper.findById(params.getId());
         if (comment == null) {
             throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND);
@@ -111,6 +131,10 @@ public class CommentService {
         }
         if (!isAdmin && !comment.getMemberId().equals(requesterId)) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+        // 최상위 댓글 삭제 시 대댓글 연쇄 소프트 삭제
+        if (comment.getParentId() == null) {
+            commentMapper.deleteRepliesByParentId(id);
         }
         commentMapper.deleteById(id);
         return id;
